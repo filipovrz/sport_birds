@@ -1,4 +1,3 @@
-<?php require BASE_PATH . '/app/Helpers/labels.php'; ?>
 <!DOCTYPE html>
 <html lang="bg">
 <head>
@@ -14,7 +13,8 @@
         <nav>
             <a href="/dashboard">Към табло</a>
             <?php if (\App\Core\Auth::isSuperAdmin()): ?><a href="/super-admin">Супер админ</a><?php endif; ?>
-            <form action="/logout" method="post" style="display:inline"><button type="submit" class="btn btn-sm btn-outline" style="color:#fff;border-color:#fff">Изход</button></form>
+            <form action="/logout" method="post" style="display:inline">
+    <?= csrf_field() ?><button type="submit" class="btn btn-sm btn-outline" style="color:#fff;border-color:#fff">Изход</button></form>
         </nav>
     </div>
 </header>

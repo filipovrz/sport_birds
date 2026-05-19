@@ -25,6 +25,7 @@ final class Auth
 
     public static function login(array $user): void
     {
+        session_regenerate_id(true);
         Session::set('user_id', $user['id']);
         Database::update('users', ['last_login_at' => date('Y-m-d H:i:s')], 'id = ?', [$user['id']]);
     }

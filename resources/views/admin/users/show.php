@@ -1,5 +1,6 @@
 <h1><?= htmlspecialchars($u['name']) ?></h1>
-<div class="card"><form method="post" action="/admin/users/<?= (int)$u['id'] ?>">
+<div class="card"><form method="post" action="/admin/users/<?= (int)$u['id'] ?>
+    <?= csrf_field() ?>">
 <label><input type="checkbox" name="is_active" <?= $u['is_active'] ? 'checked' : '' ?>> Активен</label>
 <div class="form-group"><label>Роля</label>
 <select name="role">

@@ -1,6 +1,7 @@
 <h1><?= $bird ? 'Редакция на птица' : 'Нова птица' ?></h1>
 <div class="card">
-<form method="post" action="<?= $bird ? '/dashboard/birds/'.$bird['id'] : '/dashboard/birds' ?>">
+<form method="post" enctype="multipart/form-data" action="<?= $bird ? '/dashboard/birds/'.$bird['id'] : '/dashboard/birds' ?>">
+    <?= csrf_field() ?>
     <div class="grid grid-2">
         <div class="form-group"><label>Пръстен *</label><input name="ring_number" required value="<?= htmlspecialchars($bird['ring_number'] ?? '') ?>"></div>
         <div class="form-group"><label>Име</label><input name="name" value="<?= htmlspecialchars($bird['name'] ?? '') ?>"></div>
@@ -49,9 +50,19 @@
         <div class="form-group"><label>Цвят</label><input name="color" value="<?= htmlspecialchars($bird['color'] ?? '') ?>"></div>
         <div class="form-group"><label>Линия</label><input name="strain" value="<?= htmlspecialchars($bird['strain'] ?? '') ?>"></div>
         <div class="form-group"><label>Роден</label><input type="date" name="birth_date" value="<?= htmlspecialchars($bird['birth_date'] ?? '') ?>"></div>
+        <div class="form-group"><label>Снимка</label>
+            <input type="file" name="photo" accept="image/jpeg,image/png,image/webp,image/gif">
+            <?php if (!empty($bird['photo_path'])): ?>
+                <p><img src="<?= htmlspecialchars($bird['photo_path']) ?>" alt="" style="max-width:200px;margin-top:0.5rem;border-radius:8px">
+                <br><label><input type="checkbox" name="remove_photo"> Премахни снимката</label></p>
+            <?php endif; ?>
+        </div>
     </div>
     <div class="form-group"><label>Бележки</label><textarea name="notes"><?= htmlspecialchars($bird['notes'] ?? '') ?></textarea></div>
-    <label><input type="checkbox" name="is_public_pedigree" <?= !empty($bird['is_public_pedigree']) ? 'checked' : '' ?>> Публична родословна (Pro)</label>
+    <label><input type="checkbox" name="is_public_pedigree" <?= !empty($bird['is_public_pedigree']) ? 'checked' : '' ?>> Публична родословна (споделяне)</label>
+    <?php if ($bird && !empty($bird['is_public_pedigree'])): ?>
+        <p><small>Публичен линк: <a href="/pedigree/public/<?= (int)$bird['id'] ?>" target="_blank">/pedigree/public/<?= (int)$bird['id'] ?></a></small></p>
+    <?php endif; ?>
     <p style="margin-top:1rem"><button class="btn btn-primary">Запази</button> <a href="/dashboard/birds">Отказ</a></p>
 </form>
 </div>

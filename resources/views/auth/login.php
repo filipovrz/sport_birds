@@ -1,6 +1,7 @@
 <div class="card" style="max-width:420px;margin:2rem auto">
     <h1>Вход</h1>
     <form method="post" action="/login">
+    <?= csrf_field() ?>
         <div class="form-group">
             <label>Имейл</label>
             <input type="email" name="email" required value="<?= htmlspecialchars(\App\Core\Session::flash('old')['email'] ?? '') ?>">

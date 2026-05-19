@@ -220,6 +220,7 @@ INSERT INTO subscription_plans (name, slug, description, price_bgn, duration_day
 
 INSERT INTO settings (`key`, `value`) VALUES
 ('app_installed', '0'),
+('maintenance_mode', '0'),
 ('site_name', 'Best Sport Byrds'),
 ('contact_email', 'filipovrz@gmail.com'),
 ('payment_instructions', 'Банков превод или Revolut — посочете имейла си в основанието.');

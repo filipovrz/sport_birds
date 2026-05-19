@@ -8,6 +8,7 @@
 <p class="num"><?= number_format((float)$plan['price_bgn'], 2) ?> лв / <?= (int)$plan['duration_days'] ?> дни</p>
 <p><?= htmlspecialchars($plan['description'] ?? '') ?></p>
 <form method="post" action="/dashboard/subscription/request">
+    <?= csrf_field() ?>
 <input type="hidden" name="plan_id" value="<?= (int)$plan['id'] ?>">
 <input name="payment_reference" placeholder="Референция на плащане">
 <button class="btn btn-primary">Заяви</button>

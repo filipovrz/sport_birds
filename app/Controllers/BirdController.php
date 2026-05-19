@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\App;
 use App\Core\Auth;
 use App\Core\Controller;
 use App\Core\Session;
 use App\Models\Bird;
 use App\Models\Loft;
 use App\Services\SubscriptionService;
+use App\Services\UploadService;
 
 final class BirdController extends Controller
 {
@@ -22,6 +24,10 @@ final class BirdController extends Controller
 
     public function create(): void
     {
+        if (!SubscriptionService::hasFeature('birds')) {
+            Session::flash('error', 'Нужен е платен план.');
+            $this->redirect('/dashboard/subscription');
+        }
         if (!SubscriptionService::canAddBird(Auth::id())) {
             Session::flash('error', 'Достигнахте лимита на птици за вашия план.');
             $this->redirect('/dashboard/subscription');
@@ -39,19 +45,26 @@ final class BirdController extends Controller
             Session::flash('error', 'Лимит на птици.');
             $this->redirect('/dashboard/subscription');
         }
-        $data = $this->birdData();
-        $data['user_id'] = Auth::id();
-        Bird::create($data);
-        Session::flash('success', 'Птицата е регистрирана.');
-        $this->redirect('/dashboard/birds');
+        try {
+            $data = $this->birdData();
+            $data['user_id'] = Auth::id();
+            if (!empty($_FILES['photo']['name'])) {
+                $data['photo_path'] = UploadService::storeBirdPhoto($_FILES['photo'], Auth::id());
+            }
+            Bird::create($data);
+            Session::flash('success', 'Птицата е регистрирана.');
+            $this->redirect('/dashboard/birds');
+        } catch (\RuntimeException $e) {
+            Session::flash('error', $e->getMessage());
+            $this->back();
+        }
     }
 
     public function show(string $id): void
     {
         $bird = Bird::findOwned((int) $id, Auth::id());
         if (!$bird) {
-            http_response_code(404);
-            exit;
+            App::notFound();
         }
         $this->view('birds.show', ['bird' => $bird]);
     }
@@ -60,8 +73,7 @@ final class BirdController extends Controller
     {
         $bird = Bird::findOwned((int) $id, Auth::id());
         if (!$bird) {
-            http_response_code(404);
-            exit;
+            App::notFound();
         }
         $this->view('birds.form', [
             'bird' => $bird,
@@ -74,16 +86,33 @@ final class BirdController extends Controller
     {
         $bird = Bird::findOwned((int) $id, Auth::id());
         if (!$bird) {
-            http_response_code(404);
-            exit;
+            App::notFound();
         }
-        Bird::update((int) $id, $this->birdData());
-        Session::flash('success', 'Записът е обновен.');
-        $this->redirect('/dashboard/birds/' . $id);
+        try {
+            $data = $this->birdData();
+            if (!empty($_FILES['photo']['name'])) {
+                UploadService::delete($bird['photo_path']);
+                $data['photo_path'] = UploadService::storeBirdPhoto($_FILES['photo'], Auth::id());
+            }
+            if (isset($_POST['remove_photo'])) {
+                UploadService::delete($bird['photo_path']);
+                $data['photo_path'] = null;
+            }
+            Bird::update((int) $id, $data);
+            Session::flash('success', 'Записът е обновен.');
+            $this->redirect('/dashboard/birds/' . $id);
+        } catch (\RuntimeException $e) {
+            Session::flash('error', $e->getMessage());
+            $this->back();
+        }
     }
 
     public function destroy(string $id): void
     {
+        $bird = Bird::findOwned((int) $id, Auth::id());
+        if ($bird) {
+            UploadService::delete($bird['photo_path']);
+        }
         Bird::delete((int) $id, Auth::id());
         Session::flash('success', 'Птицата е изтрита.');
         $this->redirect('/dashboard/birds');

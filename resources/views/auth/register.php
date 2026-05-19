@@ -1,6 +1,7 @@
 <div class="card" style="max-width:560px;margin:2rem auto">
     <h1>Регистрация</h1>
     <form method="post" action="/register">
+    <?= csrf_field() ?>
         <div class="form-group"><label>Име</label><input name="name" required></div>
         <div class="form-group"><label>Имейл</label><input type="email" name="email" required></div>
         <div class="form-group"><label>Парола</label><input type="password" name="password" required minlength="8"></div>

@@ -2,7 +2,8 @@
 <div class="card">
 <p>PHP: <?= htmlspecialchars($php) ?> | Env: <?= htmlspecialchars($env) ?></p>
 <form method="post" action="/super-admin/system">
-<label><input type="checkbox" name="maintenance_mode" value="1"> Режим поддръжка</label>
-<button class="btn btn-primary">Запази</button>
+    <?= csrf_field() ?>
+    <label><input type="checkbox" name="maintenance_mode" value="1" <?= !empty($maintenance) ? 'checked' : '' ?>> Режим поддръжка (само админи имат достъп)</label>
+    <p style="margin-top:1rem"><button class="btn btn-primary">Запази</button></p>
 </form>
 </div>

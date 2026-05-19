@@ -37,6 +37,13 @@ docker compose up -d --build
 3. Създайте супер админ (имейл и парола)
 4. Влезте на **http://localhost:8080/login**
 
+**Бърза инсталация (PowerShell):**
+
+```powershell
+powershell -File scripts/local-install.ps1
+# Вход: admin@test.local / TestPass123!
+```
+
 Спиране: `docker compose down`
 
 ## Инсталация на споделен хостинг

@@ -12,16 +12,18 @@ final class View
         $config = require BASE_PATH . '/config/app.php';
         $user = Auth::user();
 
+        $templatePath = BASE_PATH . '/resources/views/' . str_replace('.', '/', $template) . '.php';
         ob_start();
-        require BASE_PATH . '/resources/views/' . $template . '.php';
+        require $templatePath;
         $content = ob_get_clean();
 
         if ($layout === null) {
             return $content;
         }
 
+        $layoutPath = BASE_PATH . '/resources/views/' . str_replace('.', '/', $layout) . '.php';
         ob_start();
-        require BASE_PATH . '/resources/views/' . $layout . '.php';
+        require $layoutPath;
         return ob_get_clean();
     }
 

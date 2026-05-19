@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\App;
 use App\Core\Auth;
 use App\Core\Controller;
 use App\Core\Database;
@@ -32,6 +33,10 @@ final class BreedingController extends Controller
 
     public function create(): void
     {
+        if (!SubscriptionService::hasFeature('breeding')) {
+            Session::flash('error', 'Развъждането изисква платен план.');
+            $this->redirect('/dashboard/subscription');
+        }
         $this->view('breeding.form', [
             'birds' => Bird::parentsOptions(Auth::id()),
         ]);
@@ -64,12 +69,15 @@ final class BreedingController extends Controller
     public function show(string $id): void
     {
         $pair = Database::fetch(
-            'SELECT * FROM breeding_pairs WHERE id = ? AND user_id = ?',
+            'SELECT bp.*, m.ring_number AS male_ring, f.ring_number AS female_ring
+             FROM breeding_pairs bp
+             JOIN birds m ON m.id = bp.male_bird_id
+             JOIN birds f ON f.id = bp.female_bird_id
+             WHERE bp.id = ? AND bp.user_id = ?',
             [(int) $id, Auth::id()]
         );
         if (!$pair) {
-            http_response_code(404);
-            exit;
+            App::notFound();
         }
         $clutches = Database::fetchAll(
             'SELECT * FROM breeding_clutches WHERE breeding_pair_id = ?',

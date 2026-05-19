@@ -3,7 +3,15 @@
     <?php if ($inbreeding !== null): ?>
         <p>Оценка на инбридинг (F): <strong><?= $inbreeding ?></strong></p>
     <?php endif; ?>
-    <a href="/dashboard/birds/<?= (int)$bird['id'] ?>" class="btn btn-outline btn-sm">← Към птицата</a>
+    <p>
+        <a href="/dashboard/birds/<?= (int)$bird['id'] ?>" class="btn btn-outline btn-sm">← Към птицата</a>
+        <?php if ($canExport): ?>
+            <a href="/dashboard/birds/<?= (int)$bird['id'] ?>/pedigree/print" class="btn btn-primary btn-sm" target="_blank">Печат / PDF</a>
+        <?php endif; ?>
+        <?php if ($bird['is_public_pedigree']): ?>
+            <a href="/pedigree/public/<?= (int)$bird['id'] ?>" class="btn btn-accent btn-sm" target="_blank">Публичен линк</a>
+        <?php endif; ?>
+    </p>
 </div>
 <div class="card pedigree-tree">
     <?php

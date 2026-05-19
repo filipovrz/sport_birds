@@ -31,6 +31,10 @@ final class TrainingController extends Controller
 
     public function create(): void
     {
+        if (!SubscriptionService::hasFeature('training')) {
+            Session::flash('error', 'Тренировките изискват платен план.');
+            $this->redirect('/dashboard/subscription');
+        }
         $this->view('training.form', [
             'lofts' => Loft::forUser(Auth::id()),
             'birds' => Bird::forUser(Auth::id()),

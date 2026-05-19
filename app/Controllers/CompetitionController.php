@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\App;
 use App\Core\Auth;
 use App\Core\Controller;
 use App\Core\Database;
@@ -28,6 +29,10 @@ final class CompetitionController extends Controller
 
     public function create(): void
     {
+        if (!SubscriptionService::hasFeature('competitions')) {
+            Session::flash('error', 'Състезанията изискват платен план.');
+            $this->redirect('/dashboard/subscription');
+        }
         $this->view('competitions.form', ['competition' => null]);
     }
 
@@ -53,8 +58,7 @@ final class CompetitionController extends Controller
     {
         $comp = Database::fetch('SELECT * FROM competitions WHERE id = ? AND user_id = ?', [(int) $id, Auth::id()]);
         if (!$comp) {
-            http_response_code(404);
-            exit;
+            App::notFound();
         }
         $results = Database::fetchAll(
             'SELECT r.*, b.ring_number, b.name AS bird_name FROM competition_results r
@@ -70,6 +74,15 @@ final class CompetitionController extends Controller
 
     public function storeResult(string $id): void
     {
+        $comp = Database::fetch('SELECT id FROM competitions WHERE id = ? AND user_id = ?', [(int) $id, Auth::id()]);
+        if (!$comp) {
+            App::notFound();
+        }
+        $bird = Bird::findOwned((int) $_POST['bird_id'], Auth::id());
+        if (!$bird) {
+            Session::flash('error', 'Невалидна птица.');
+            $this->back();
+        }
         Database::insert('competition_results', [
             'competition_id' => (int) $id,
             'bird_id' => (int) $_POST['bird_id'],

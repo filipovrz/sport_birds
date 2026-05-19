@@ -2,6 +2,8 @@
 /vendor/
 /storage/uploads/*
 !/storage/uploads/.gitkeep
+/public/uploads/*
+!/public/uploads/.gitkeep
 .idea/
 .vscode/
 *.log

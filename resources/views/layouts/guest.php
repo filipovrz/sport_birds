@@ -1,4 +1,3 @@
-<?php require BASE_PATH . '/app/Helpers/labels.php'; ?>
 <!DOCTYPE html>
 <html lang="bg">
 <head>
@@ -15,7 +14,8 @@
             <a href="/pricing">Цени</a>
             <?php if ($user): ?>
                 <a href="/dashboard">Табло</a>
-                <form action="/logout" method="post" style="display:inline"><button type="submit" class="btn btn-sm btn-outline" style="color:#fff;border-color:#fff">Изход</button></form>
+                <form action="/logout" method="post" style="display:inline">
+    <?= csrf_field() ?><button type="submit" class="btn btn-sm btn-outline" style="color:#fff;border-color:#fff">Изход</button></form>
             <?php else: ?>
                 <a href="/login">Вход</a>
                 <a href="/register" class="btn btn-sm btn-accent">Регистрация</a>

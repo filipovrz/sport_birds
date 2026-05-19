@@ -1,5 +1,10 @@
 <?php
 
+function csrf_field(): string
+{
+    return \App\Core\Csrf::field();
+}
+
 function species_label(string $key): string
 {
     return match ($key) {

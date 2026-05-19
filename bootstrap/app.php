@@ -14,6 +14,8 @@ spl_autoload_register(function (string $class): void {
     }
 });
 
+require_once BASE_PATH . '/app/Helpers/labels.php';
+
 $config = require BASE_PATH . '/config/app.php';
 date_default_timezone_set($config['timezone']);
 

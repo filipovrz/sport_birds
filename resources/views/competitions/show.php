@@ -8,7 +8,8 @@
 <?php endforeach; ?>
 </table>
 <h3>Добави резултат</h3>
-<form method="post" action="/dashboard/competitions/<?= (int)$competition['id'] ?>/results">
+<form method="post" action="/dashboard/competitions/<?= (int)$competition['id'] ?>
+    <?= csrf_field() ?>/results">
 <select name="bird_id"><?php foreach ($birds as $b): ?><option value="<?= (int)$b['id'] ?>"><?= htmlspecialchars($b['ring_number']) ?></option><?php endforeach; ?></select>
 <input name="position" type="number" placeholder="Място">
 <input name="velocity_mpm" placeholder="Скорост m/min">

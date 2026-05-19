@@ -1,5 +1,6 @@
 <h1>Ново състезание</h1>
 <div class="card"><form method="post" action="/dashboard/competitions">
+    <?= csrf_field() ?>
 <div class="form-group"><label>Име *</label><input name="name" required></div>
 <div class="form-group"><label>Дата *</label><input type="date" name="event_date" required></div>
 <div class="form-group"><label>Тип</label><select name="competition_type">

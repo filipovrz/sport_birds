@@ -1,5 +1,6 @@
 <h1><?= $plan ? 'Редакция на план' : 'Нов план' ?></h1>
-<div class="card"><form method="post" action="<?= $plan ? '/admin/plans/'.$plan['id'] : '/admin/plans' ?>">
+<div class="card"><form method="post" action="<?= $plan ? '/admin/plans/'.$plan['id'] : '/admin/plans' ?>
+    <?= csrf_field() ?>">
 <div class="form-group"><label>Име</label><input name="name" value="<?= htmlspecialchars($plan['name'] ?? '') ?>" required></div>
 <?php if (!$plan): ?><div class="form-group"><label>Slug</label><input name="slug" required></div><?php endif; ?>
 <div class="form-group"><label>Цена (лв)</label><input name="price_bgn" type="number" step="0.01" value="<?= $plan['price_bgn'] ?? 0 ?>"></div>

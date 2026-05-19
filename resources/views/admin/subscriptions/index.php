@@ -9,8 +9,10 @@
 <td><?= htmlspecialchars($r['payment_reference'] ?? '—') ?></td>
 <td>
 <?php if ($r['status'] === 'pending'): ?>
-<form method="post" action="/admin/subscriptions/<?= (int)$r['id'] ?>/approve" style="display:inline"><button class="btn btn-primary btn-sm">Одобри</button></form>
-<form method="post" action="/admin/subscriptions/<?= (int)$r['id'] ?>/reject" style="display:inline"><button class="btn btn-danger btn-sm">Отхвърли</button></form>
+<form method="post" action="/admin/subscriptions/<?= (int)$r['id'] ?>
+    <?= csrf_field() ?>/approve" style="display:inline"><button class="btn btn-primary btn-sm">Одобри</button></form>
+<form method="post" action="/admin/subscriptions/<?= (int)$r['id'] ?>
+    <?= csrf_field() ?>/reject" style="display:inline"><button class="btn btn-danger btn-sm">Отхвърли</button></form>
 <?php endif; ?>
 </td></tr>
 <?php endforeach; ?>
