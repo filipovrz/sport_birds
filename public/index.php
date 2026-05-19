@@ -31,6 +31,12 @@ $router->post('/install', 'InstallController@run', array_merge($mw, [InstallLock
 $router->get('/', 'HomeController@index', array_merge($mw, $installed));
 $router->get('/pricing', 'HomeController@pricing', array_merge($mw, $installed));
 $router->get('/pedigree/public/{id}', 'PublicPedigreeController@show', $mw);
+$router->get('/announcements', 'AnnouncementController@index', array_merge($mw, $installed));
+$router->get('/announcements/{id}', 'AnnouncementController@show', array_merge($mw, $installed));
+
+// GPS API (устройства изпращат позиция)
+$router->post('/api/gps/track', 'GpsApiController@track', $mw);
+$router->get('/api/gps/track', 'GpsApiController@track', $mw);
 
 $router->get('/login', 'AuthController@showLogin', array_merge($mw, $installed, [GuestMiddleware::class]));
 $router->post('/login', 'AuthController@login', array_merge($mw, $installed, [GuestMiddleware::class], $csrf));
@@ -85,6 +91,21 @@ $router->group(['prefix' => '/dashboard', 'middleware' => array_merge($mw, $inst
 
     $r->get('/subscription', 'SubscriptionController@index');
     $r->post('/subscription/request', 'SubscriptionController@requestPlan', $csrf);
+
+    $r->get('/map', 'MapController@index');
+    $r->get('/gps', 'GpsDeviceController@index');
+    $r->get('/gps/create', 'GpsDeviceController@create');
+    $r->post('/gps', 'GpsDeviceController@store', $csrf);
+    $r->get('/gps/{id}', 'GpsDeviceController@show');
+    $r->get('/gps/{id}/edit', 'GpsDeviceController@edit');
+    $r->post('/gps/{id}', 'GpsDeviceController@update', $csrf);
+    $r->post('/gps/{id}/delete', 'GpsDeviceController@destroy', $csrf);
+    $r->post('/gps/{id}/token', 'GpsDeviceController@regenerateToken', $csrf);
+
+    $r->get('/announcements/my', 'AnnouncementController@my');
+    $r->get('/announcements/create', 'AnnouncementController@create');
+    $r->post('/announcements', 'AnnouncementController@store', $csrf);
+    $r->post('/announcements/{id}/register', 'AnnouncementController@register', $csrf);
 });
 
 // Admin panel

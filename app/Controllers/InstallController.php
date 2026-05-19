@@ -61,6 +61,7 @@ final class InstallController extends Controller
             file_put_contents(BASE_PATH . '/.env', $env);
 
             $pdo->prepare("INSERT INTO settings (`key`, `value`) VALUES ('app_installed', '1') ON DUPLICATE KEY UPDATE `value` = '1'")->execute();
+            $pdo->prepare("INSERT INTO settings (`key`, `value`) VALUES ('app_version', '2.0.0') ON DUPLICATE KEY UPDATE `value` = '2.0.0'")->execute();
             $pdo->prepare("INSERT INTO settings (`key`, `value`) VALUES ('maintenance_mode', '0') ON DUPLICATE KEY UPDATE `value` = '0'")->execute();
 
             $this->view('install.success', ['admin_email' => $adminEmail], 'layouts.guest');

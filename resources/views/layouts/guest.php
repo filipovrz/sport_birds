@@ -12,6 +12,7 @@
         <a href="/" class="brand"><?= htmlspecialchars($config['name']) ?></a>
         <nav>
             <a href="/pricing">Цени</a>
+            <a href="/announcements">Състезания</a>
             <?php if ($user): ?>
                 <a href="/dashboard">Табло</a>
                 <form action="/logout" method="post" style="display:inline">

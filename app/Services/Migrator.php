@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Services;
+
+use App\Core\Database;
+use PDO;
+
+final class Migrator
+{
+    /** @var array<string, string> version => sql file */
+    private const PHASES = [
+        '2.0.0' => 'phase2.sql',
+    ];
+
+    public static function currentVersion(): string
+    {
+        try {
+            $row = Database::fetch("SELECT `value` FROM settings WHERE `key` = 'app_version'");
+            return $row['value'] ?? '1.0.0';
+        } catch (\Throwable) {
+            return '1.0.0';
+        }
+    }
+
+    public static function runPending(): void
+    {
+        if (!is_file(BASE_PATH . '/.env')) {
+            return;
+        }
+        $current = self::currentVersion();
+        foreach (self::PHASES as $version => $file) {
+            if (version_compare($current, $version, '>=')) {
+                continue;
+            }
+            self::runFile(BASE_PATH . '/database/' . $file);
+            Database::query(
+                'INSERT INTO settings (`key`, `value`) VALUES ("app_version", ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)',
+                [$version]
+            );
+            $current = $version;
+        }
+    }
+
+    private static function runFile(string $path): void
+    {
+        if (!is_file($path)) {
+            return;
+        }
+        $pdo = Database::connection();
+        $sql = preg_replace('/--.*$/m', '', file_get_contents($path));
+        foreach (preg_split('/;\s*(?:\r\n|\n|\r)/', $sql) as $stmt) {
+            $stmt = trim($stmt);
+            if ($stmt !== '') {
+                $pdo->exec($stmt);
+            }
+        }
+    }
+}

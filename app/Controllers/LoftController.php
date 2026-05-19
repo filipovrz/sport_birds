@@ -21,7 +21,7 @@ final class LoftController extends Controller
     public function create(): void
     {
         if (!SubscriptionService::canAddLoft(Auth::id())) {
-            Session::flash('error', 'Лимит на голубарници за вашия план.');
+            Session::flash('error', 'Лимит на птичарници за вашия план.');
             $this->redirect('/dashboard/subscription');
         }
         $this->view('lofts.form', ['loft' => null]);
@@ -42,7 +42,7 @@ final class LoftController extends Controller
             'capacity' => ($_POST['capacity'] ?? '') ? (int) $_POST['capacity'] : null,
             'notes' => trim($_POST['notes'] ?? '') ?: null,
         ]);
-        Session::flash('success', 'Голубарникът е създаден.');
+        Session::flash('success', 'Птичарникът е създаден.');
         $this->redirect('/dashboard/lofts');
     }
 
@@ -80,9 +80,11 @@ final class LoftController extends Controller
         Loft::update((int) $id, [
             'name' => $d['name'],
             'location' => trim($_POST['location'] ?? '') ?: null,
+            'latitude' => ($_POST['latitude'] ?? '') !== '' ? $_POST['latitude'] : null,
+            'longitude' => ($_POST['longitude'] ?? '') !== '' ? $_POST['longitude'] : null,
             'notes' => trim($_POST['notes'] ?? '') ?: null,
         ]);
-        Session::flash('success', 'Голубарникът е обновен.');
+        Session::flash('success', 'Птичарникът е обновен.');
         $this->redirect('/dashboard/lofts/' . $id);
     }
 

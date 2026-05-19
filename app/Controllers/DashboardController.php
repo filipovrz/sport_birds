@@ -28,11 +28,25 @@ final class DashboardController extends Controller
                 'SELECT * FROM competitions WHERE user_id = ? ORDER BY event_date DESC LIMIT 5',
                 [$uid]
             ),
+            'gps_active' => 0,
+            'announcements_open' => 0,
         ];
+        try {
+            $stats['gps_active'] = (int) (Database::fetch(
+                'SELECT COUNT(*) AS c FROM gps_devices WHERE user_id = ? AND is_active = 1',
+                [$uid]
+            )['c'] ?? 0);
+            $stats['announcements_open'] = (int) (Database::fetch(
+                "SELECT COUNT(*) AS c FROM competition_announcements WHERE status = 'published' AND event_date >= CURDATE()"
+            )['c'] ?? 0);
+        } catch (\Throwable) {
+        }
+        $cfg = require BASE_PATH . '/config/app.php';
         $this->view('dashboard.index', [
             'stats' => $stats,
             'plan' => SubscriptionService::currentPlan(Auth::user()),
             'isPremium' => Auth::hasPremium(),
+            'appVersion' => $cfg['version'] ?? '2.0.0',
         ]);
     }
 }

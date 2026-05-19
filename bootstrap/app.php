@@ -27,4 +27,9 @@ if (is_file(BASE_PATH . '/.env')) {
         [$key, $value] = explode('=', $line, 2);
         $_ENV[trim($key)] = trim($value, " \t\"'");
     }
+    try {
+        \App\Services\Migrator::runPending();
+    } catch (\Throwable) {
+        // DB not ready during install
+    }
 }
