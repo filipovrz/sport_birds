@@ -7,4 +7,5 @@
 <div class="form-group"><label>Дата на съединение</label><input type="date" name="paired_at"></div>
 <div class="form-group"><label>Дата на яйца</label><input type="date" name="laid_at"></div>
 <div class="form-group"><label>Брой яйца</label><input type="number" name="egg_count"></div>
+<label style="display:block;margin-top:0.75rem"><input type="checkbox" name="is_public" <?= !empty(\App\Core\Auth::user()['default_public_breeding']) ? 'checked' : '' ?>> <strong>Публична развъдна двойка</strong></label>
 <button class="btn btn-primary">Запази</button></form></div>

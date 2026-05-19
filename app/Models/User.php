@@ -18,6 +18,22 @@ final class User
         return Database::fetch('SELECT * FROM users WHERE email = ?', [$email]);
     }
 
+    public static function findByVerificationToken(string $token): ?array
+    {
+        return Database::fetch(
+            'SELECT * FROM users WHERE email_verification_token = ? AND email_verified_at IS NULL LIMIT 1',
+            [$token]
+        );
+    }
+
+    public static function markEmailVerified(int $id): void
+    {
+        Database::query(
+            'UPDATE users SET email_verified_at = NOW(), email_verification_token = NULL, updated_at = NOW() WHERE id = ?',
+            [$id]
+        );
+    }
+
     public static function create(array $data): int
     {
         $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);

@@ -8,6 +8,9 @@ abstract class Controller
 {
     protected function view(string $template, array $data = [], ?string $layout = 'layouts.app'): never
     {
+        if (!headers_sent()) {
+            header('Content-Type: text/html; charset=UTF-8');
+        }
         echo View::render($template, $data, $layout);
         exit;
     }

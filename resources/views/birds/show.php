@@ -9,7 +9,7 @@
             <?php if ($bird['strain']): ?><p><strong>Линия:</strong> <?= htmlspecialchars($bird['strain']) ?></p><?php endif; ?>
             <p>
                 <a href="/dashboard/birds/<?= (int)$bird['id'] ?>/edit" class="btn btn-outline btn-sm">Редакция</a>
-                <a href="/dashboard/birds/<?= (int)$bird['id'] ?>/pedigree" class="btn btn-primary btn-sm">Родословна</a>
+                <a href="/dashboard/birds/<?= (int)$bird['id'] ?>/pedigree" class="btn btn-primary btn-sm">Родословие</a>
             </p>
         </div>
     </div>

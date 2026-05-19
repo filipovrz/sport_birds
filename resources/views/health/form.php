@@ -4,7 +4,7 @@
 <div class="form-group"><label>Заглавие *</label><input name="title" required value="<?= htmlspecialchars($record['title'] ?? '') ?>"></div>
 <div class="form-group"><label>Тип</label><select name="record_type">
 <?php foreach (['vaccination','treatment','illness','parasite','checkup','other'] as $t): ?>
-<option value="<?= $t ?>" <?= ($record['record_type'] ?? '') === $t ? 'selected' : '' ?>><?= $t ?></option>
+<option value="<?= $t ?>" <?= ($record['record_type'] ?? '') === $t ? 'selected' : '' ?>><?= health_record_type_label($t) ?></option>
 <?php endforeach; ?></select></div>
 <div class="form-group"><label>Птица</label><select name="bird_id"><option value="">—</option>
 <?php foreach ($birds as $b): ?>

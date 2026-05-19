@@ -21,7 +21,7 @@ final class LoftController extends Controller
     public function create(): void
     {
         if (!SubscriptionService::canAddLoft(Auth::id())) {
-            Session::flash('error', 'Лимит на птичарници за вашия план.');
+            Session::flash('error', 'Лимит на гълъбарници за вашия план.');
             $this->redirect('/dashboard/subscription');
         }
         $this->view('lofts.form', ['loft' => null]);
@@ -37,12 +37,13 @@ final class LoftController extends Controller
             'user_id' => Auth::id(),
             'name' => $d['name'],
             'location' => trim($_POST['location'] ?? '') ?: null,
-            'latitude' => ($_POST['latitude'] ?? '') ?: null,
-            'longitude' => ($_POST['longitude'] ?? '') ?: null,
+            'latitude' => $this->coordFromPost('latitude'),
+            'longitude' => $this->coordFromPost('longitude'),
             'capacity' => ($_POST['capacity'] ?? '') ? (int) $_POST['capacity'] : null,
             'notes' => trim($_POST['notes'] ?? '') ?: null,
+            'is_public' => isset($_POST['is_public']) ? 1 : (!empty(Auth::user()['default_public_lofts']) ? 1 : 0),
         ]);
-        Session::flash('success', 'Птичарникът е създаден.');
+        Session::flash('success', 'Гълъбарникът е създаден.');
         $this->redirect('/dashboard/lofts');
     }
 
@@ -80,11 +81,13 @@ final class LoftController extends Controller
         Loft::update((int) $id, [
             'name' => $d['name'],
             'location' => trim($_POST['location'] ?? '') ?: null,
-            'latitude' => ($_POST['latitude'] ?? '') !== '' ? $_POST['latitude'] : null,
-            'longitude' => ($_POST['longitude'] ?? '') !== '' ? $_POST['longitude'] : null,
+            'latitude' => $this->coordFromPost('latitude'),
+            'longitude' => $this->coordFromPost('longitude'),
+            'capacity' => ($_POST['capacity'] ?? '') !== '' ? (int) $_POST['capacity'] : null,
             'notes' => trim($_POST['notes'] ?? '') ?: null,
+            'is_public' => isset($_POST['is_public']) ? 1 : 0,
         ]);
-        Session::flash('success', 'Птичарникът е обновен.');
+        Session::flash('success', 'Гълъбарникът е обновен.');
         $this->redirect('/dashboard/lofts/' . $id);
     }
 
@@ -94,4 +97,18 @@ final class LoftController extends Controller
         Session::flash('success', 'Изтрит.');
         $this->redirect('/dashboard/lofts');
     }
+
+    private function coordFromPost(string $field): ?float
+    {
+        $v = trim((string) ($_POST[$field] ?? ''));
+        if ($v === '') {
+            return null;
+        }
+        if (!is_numeric($v)) {
+            return null;
+        }
+
+        return (float) $v;
+    }
+
 }

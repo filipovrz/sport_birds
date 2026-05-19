@@ -8,31 +8,35 @@
 </head>
 <body class="app-shell">
 <header class="site-header">
-    <div class="container" style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+    <div class="container site-header__inner">
         <a href="/admin" class="brand">Админ панел</a>
-        <nav>
-            <a href="/">Портал</a>
+        <nav class="site-header__nav">
+            <a href="/">Начало</a>
             <a href="/dashboard">Към табло</a>
             <?php if (\App\Core\Auth::isSuperAdmin()): ?><a href="/super-admin">Супер админ</a><?php endif; ?>
-            <form action="/logout" method="post" style="display:inline">
-    <?= csrf_field() ?><button type="submit" class="btn btn-sm btn-outline" style="color:#fff;border-color:#fff">Изход</button></form>
+            <form action="/logout" method="post" class="site-header__logout">
+                <?= csrf_field() ?>
+                <button type="submit" class="btn btn-sm btn-outline site-header__logout-btn">Изход</button>
+            </form>
         </nav>
     </div>
 </header>
-<main class="container sidebar-layout">
-    <aside class="sidebar">
-        <a href="/">← Портал</a>
-        <a href="/admin">Обзор</a>
-        <a href="/admin/users">Потребители</a>
-        <a href="/admin/plans">Планове</a>
-        <a href="/admin/subscriptions">Абонаменти</a>
-        <a href="/admin/settings">Настройки</a>
-    </aside>
-    <section>
-        <?php if ($msg = \App\Core\Session::flash('success')): ?><div class="alert alert-success"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
-        <?php if ($msg = \App\Core\Session::flash('error')): ?><div class="alert alert-error"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
-        <?= $content ?>
-    </section>
+<main class="container dashboard-main">
+    <?php if ($msg = \App\Core\Session::flash('success')): ?><div class="alert alert-success"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
+    <?php if ($msg = \App\Core\Session::flash('error')): ?><div class="alert alert-error"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
+    <div class="sidebar-layout">
+        <div class="sidebar-mobile-bar">
+            <button type="button" class="btn btn-outline sidebar-toggle" data-sidebar-toggle aria-expanded="false" aria-controls="admin-sidebar">☰ Меню</button>
+        </div>
+        <aside class="sidebar" id="admin-sidebar">
+            <?php require __DIR__ . '/_admin_sidebar.php'; ?>
+        </aside>
+        <section class="dashboard-content">
+            <?= $content ?>
+        </section>
+    </div>
 </main>
+<?php require __DIR__ . '/_footer.php'; ?>
+<script src="/assets/js/app-nav.js" defer></script>
 </body>
 </html>

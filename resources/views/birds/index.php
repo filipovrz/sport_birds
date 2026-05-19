@@ -4,7 +4,7 @@
 </div>
 <div class="card">
 <table>
-<tr><th>Пръстен</th><th>Име</th><th>Вид</th><th>Птицарник</th><th>Статус</th><th></th></tr>
+<tr><th>Пръстен</th><th>Име</th><th>Вид</th><th>Гълъбарник</th><th>Статус</th><th></th></tr>
 <?php foreach ($birds as $b): ?>
 <tr>
     <td><?= htmlspecialchars($b['ring_number']) ?></td>
@@ -14,7 +14,7 @@
     <td><?= status_label($b['status']) ?></td>
     <td>
         <a href="/dashboard/birds/<?= (int)$b['id'] ?>">Преглед</a> |
-        <a href="/dashboard/birds/<?= (int)$b['id'] ?>/pedigree">Родословна</a>
+        <a href="/dashboard/birds/<?= (int)$b['id'] ?>/pedigree">Родословие</a>
     </td>
 </tr>
 <?php endforeach; ?>

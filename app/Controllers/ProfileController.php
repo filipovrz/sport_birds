@@ -27,6 +27,10 @@ final class ProfileController extends Controller
             'city' => trim($_POST['city'] ?? '') ?: null,
             'club_name' => trim($_POST['club_name'] ?? '') ?: null,
             'password' => $_POST['password'] ?? '',
+            'is_public_profile' => isset($_POST['is_public_profile']) ? 1 : 0,
+            'default_public_birds' => isset($_POST['default_public_birds']) ? 1 : 0,
+            'default_public_lofts' => isset($_POST['default_public_lofts']) ? 1 : 0,
+            'default_public_breeding' => isset($_POST['default_public_breeding']) ? 1 : 0,
         ]);
         Session::flash('success', 'Профилът е обновен.');
         $this->redirect('/dashboard/profile');

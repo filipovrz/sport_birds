@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($config['name']) ?> — Портал</title>
+    <title><?= htmlspecialchars($config['name']) ?> — Карта на страниците</title>
     <link rel="stylesheet" href="/assets/css/app.css">
     <link rel="stylesheet" href="/assets/css/hub.css">
 </head>
@@ -12,6 +12,7 @@
     <div class="container">
         <a href="/" class="hub-brand">Best Sport <span>Byrds</span></a>
         <nav class="hub-topnav">
+            <a href="/">Начало</a>
             <?php if ($installed): ?>
                 <a href="/login">Вход</a>
                 <a href="/register" class="hub-cta">Регистрация</a>
@@ -20,7 +21,7 @@
                 <a href="/install" class="hub-cta">Инсталация</a>
             <?php endif; ?>
             <a href="/pricing">Цени</a>
-            <a href="/announcements">Обяви</a>
+            <?php $variant = 'header'; require __DIR__ . '/_nav_announcements.php'; ?>
         </nav>
     </div>
 </header>

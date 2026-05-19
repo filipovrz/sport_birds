@@ -13,4 +13,5 @@
         <button type="submit" class="btn btn-primary">Влез</button>
     </form>
     <p style="margin-top:1rem"><a href="/register">Нямате акаунт? Регистрирайте се</a></p>
+    <p style="margin-top:0.5rem;font-size:0.9rem"><a href="/verify-email/pending">Не сте получили имейл за потвърждение?</a></p>
 </div>

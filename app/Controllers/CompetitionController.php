@@ -42,7 +42,7 @@ final class CompetitionController extends Controller
         $id = Database::insert('competitions', [
             'user_id' => Auth::id(),
             'name' => $d['name'],
-            'competition_type' => $_POST['competition_type'] ?? 'race',
+            'competition_type' => $this->competitionTypeFromPost(),
             'species' => $_POST['species'] ?? 'racing_pigeon',
             'event_date' => $d['event_date'],
             'location' => trim($_POST['location'] ?? '') ?: null,
@@ -94,5 +94,12 @@ final class CompetitionController extends Controller
         ]);
         Session::flash('success', 'Резултатът е добавен.');
         $this->redirect('/dashboard/competitions/' . $id);
+    }
+
+    private function competitionTypeFromPost(): string
+    {
+        $type = $_POST['competition_type'] ?? 'race';
+
+        return in_array($type, competition_type_options(), true) ? $type : 'race';
     }
 }

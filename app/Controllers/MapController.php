@@ -9,6 +9,7 @@ use App\Core\Controller;
 use App\Core\Session;
 use App\Models\GpsDevice;
 use App\Models\Loft;
+use App\Services\GeocodingService;
 use App\Services\SubscriptionService;
 use App\Core\Database;
 
@@ -30,7 +31,7 @@ final class MapController extends Controller
                     'lat' => (float) $loft['latitude'],
                     'lng' => (float) $loft['longitude'],
                     'title' => $loft['name'],
-                    'desc' => $loft['location'] ?? 'Птичарник',
+                    'desc' => $loft['location'] ?? 'Гълъбарник',
                 ];
             }
         }
@@ -47,15 +48,27 @@ final class MapController extends Controller
         }
 
         $announcements = Database::fetchAll(
-            "SELECT id, title, latitude, longitude, event_date, location FROM competition_announcements
-             WHERE status = 'published' AND latitude IS NOT NULL AND longitude IS NOT NULL
-             AND event_date >= CURDATE() ORDER BY event_date LIMIT 50"
+            "SELECT id, title, latitude, longitude, release_latitude, release_longitude,
+                    event_date, location
+             FROM competition_announcements
+             WHERE status = 'published'
+             AND event_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+             ORDER BY event_date ASC
+             LIMIT 50"
         );
         foreach ($announcements as $a) {
+            $coords = GeocodingService::resolve(
+                $a['location'] ?? null,
+                $a['latitude'] ?? $a['release_latitude'] ?? null,
+                $a['longitude'] ?? $a['release_longitude'] ?? null
+            );
+            if (!$coords) {
+                continue;
+            }
             $markers[] = [
-                'type' => 'event',
-                'lat' => (float) $a['latitude'],
-                'lng' => (float) $a['longitude'],
+                'type' => 'competition',
+                'lat' => $coords['lat'],
+                'lng' => $coords['lng'],
                 'title' => $a['title'],
                 'desc' => $a['event_date'] . ' — ' . ($a['location'] ?? ''),
                 'url' => '/announcements/' . $a['id'],

@@ -36,7 +36,7 @@ final class PedigreeController extends Controller
             App::notFound();
         }
         if (!SubscriptionService::hasFeature('pedigree_export')) {
-            Session::flash('error', 'PDF/печат на родословна изисква Pro план.');
+            Session::flash('error', 'PDF/печат на родословие изисква Pro план.');
             $this->redirect('/dashboard/birds/' . $id . '/pedigree');
         }
         $this->view('pedigree.print', [

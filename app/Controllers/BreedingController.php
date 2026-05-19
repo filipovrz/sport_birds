@@ -53,6 +53,7 @@ final class BreedingController extends Controller
             'season_year' => (int) ($_POST['season_year'] ?? date('Y')),
             'paired_at' => ($_POST['paired_at'] ?? '') ?: null,
             'notes' => trim($_POST['notes'] ?? '') ?: null,
+            'is_public' => isset($_POST['is_public']) ? 1 : (!empty(Auth::user()['default_public_breeding']) ? 1 : 0),
         ]);
         if (($_POST['laid_at'] ?? '') !== '') {
             $pairId = (int) Database::connection()->lastInsertId();

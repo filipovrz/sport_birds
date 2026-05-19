@@ -76,6 +76,9 @@ final class Router
         }
 
         http_response_code(404);
+        if (!headers_sent()) {
+            header('Content-Type: text/html; charset=UTF-8');
+        }
         echo View::render('errors.404', [], 'layouts.guest');
     }
 

@@ -1,0 +1,240 @@
+/* Production landing — Best Sport Byrds */
+.landing-page {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 75% 55% at 15% -15%, rgba(30, 95, 138, 0.14), transparent),
+    radial-gradient(ellipse 55% 45% at 100% 0%, rgba(232, 168, 56, 0.12), transparent);
+}
+
+.landing-hero {
+  text-align: center;
+  padding: 4rem 1.25rem 3rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.landing-hero h1 {
+  font-size: clamp(2.25rem, 6vw, 3.25rem);
+  margin: 0 0 0.5rem;
+  color: var(--primary-dark);
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.landing-hero h1 em {
+  font-style: normal;
+  color: var(--primary);
+}
+
+.landing-hero .tagline {
+  font-size: 1.2rem;
+  color: var(--muted);
+  margin: 0 0 1.25rem;
+}
+
+.landing-hero .intro {
+  font-size: 1.05rem;
+  color: var(--text);
+  line-height: 1.65;
+  margin-bottom: 2rem;
+}
+
+.landing-cta {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.landing-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.landing-stat {
+  text-align: center;
+}
+
+.landing-stat strong {
+  display: block;
+  font-size: 1.75rem;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.landing-stat span {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.landing-features {
+  padding: 2rem 0 3rem;
+}
+
+.landing-features h2 {
+  text-align: center;
+  color: var(--primary-dark);
+  margin-bottom: 2rem;
+  font-size: 1.75rem;
+}
+
+.landing-feature-card {
+  height: 100%;
+  border-top: 4px solid var(--primary);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.landing-feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(30, 95, 138, 0.12);
+}
+
+.landing-feature-card .icon {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.landing-feature-card h3 {
+  margin: 0 0 0.5rem;
+  color: var(--primary-dark);
+}
+
+.landing-plans {
+  background: linear-gradient(180deg, #fff 0%, var(--bg) 100%);
+  padding: 3rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.landing-plans h2 {
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.landing-plans .sub {
+  text-align: center;
+  color: var(--muted);
+  margin-bottom: 2rem;
+}
+
+.landing-plans .grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.landing-plan-card {
+  text-align: center;
+  position: relative;
+}
+
+.landing-plan-card.featured {
+  border: 2px solid var(--accent);
+  box-shadow: 0 8px 28px rgba(232, 168, 56, 0.2);
+}
+
+.landing-plan-card .price {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0.5rem 0;
+}
+
+.landing-audience {
+  padding: 2.5rem 0;
+}
+
+.landing-audience ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.landing-audience li {
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.landing-audience li::before {
+  content: '✓ ';
+  color: var(--success);
+  font-weight: bold;
+}
+
+.landing-footer-cta {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  color: #fff;
+  border-radius: var(--radius);
+  margin-bottom: 2rem;
+}
+
+.landing-footer-cta h2 {
+  margin-top: 0;
+  color: #fff;
+}
+
+.landing-footer-cta p {
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+}
+
+.landing-footer-cta .btn-primary {
+  background: var(--accent);
+  color: var(--primary-dark);
+}
+
+.landing-footer-cta .btn-outline {
+  border-color: #fff;
+  color: #fff;
+  margin-left: 0.5rem;
+}
+
+.site-footer-pro {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  border-top: 1px solid var(--border);
+}
+
+.site-footer-pro a {
+  color: var(--primary);
+}
+
+@media (max-width: 991px) {
+  .landing-hero {
+    padding: 2.5rem 1rem 2rem;
+  }
+  .landing-features {
+    grid-template-columns: 1fr;
+  }
+  .landing-plans {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .landing-hero .cta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    align-items: stretch;
+  }
+  .landing-hero .cta .btn {
+    margin: 0;
+    text-align: center;
+  }
+  .landing-footer-cta .btn-outline {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+}

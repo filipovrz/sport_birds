@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS subscription_plans (
     name VARCHAR(100) NOT NULL,
     slug VARCHAR(50) NOT NULL UNIQUE,
     description TEXT NULL,
-    price_bgn DECIMAL(10,2) NOT NULL DEFAULT 0,
+    price_eur DECIMAL(10,2) NOT NULL DEFAULT 0,
     duration_days INT UNSIGNED NOT NULL DEFAULT 30,
     max_birds INT UNSIGNED NULL,
     max_lofts INT UNSIGNED NULL,
@@ -40,7 +40,14 @@ CREATE TABLE IF NOT EXISTS users (
     subscription_plan_id INT UNSIGNED NULL,
     subscription_expires_at DATETIME NULL,
     is_active TINYINT(1) NOT NULL DEFAULT 1,
+    is_public_profile TINYINT(1) NOT NULL DEFAULT 0,
+    default_public_birds TINYINT(1) NOT NULL DEFAULT 0,
+    default_public_lofts TINYINT(1) NOT NULL DEFAULT 0,
+    default_public_breeding TINYINT(1) NOT NULL DEFAULT 0,
     email_verified_at DATETIME NULL,
+    email_verification_token VARCHAR(64) NULL,
+    terms_accepted_at DATETIME NULL,
+    age_confirmed_at DATETIME NULL,
     last_login_at DATETIME NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -73,6 +80,7 @@ CREATE TABLE IF NOT EXISTS lofts (
     capacity INT UNSIGNED NULL,
     notes TEXT NULL,
     is_active TINYINT(1) NOT NULL DEFAULT 1,
+    is_public TINYINT(1) NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
@@ -97,6 +105,7 @@ CREATE TABLE IF NOT EXISTS birds (
     achievements TEXT NULL,
     notes TEXT NULL,
     is_public_pedigree TINYINT(1) NOT NULL DEFAULT 0,
+    is_public TINYINT(1) NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY unique_ring_user (user_id, ring_number),
@@ -114,6 +123,7 @@ CREATE TABLE IF NOT EXISTS breeding_pairs (
     season_year YEAR NOT NULL,
     paired_at DATE NULL,
     notes TEXT NULL,
+    is_public TINYINT(1) NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (male_bird_id) REFERENCES birds(id) ON DELETE CASCADE,
@@ -271,10 +281,17 @@ CREATE TABLE IF NOT EXISTS competition_announcements (
     contact_email VARCHAR(255) NULL,
     contact_phone VARCHAR(30) NULL,
     status ENUM('draft','published','cancelled','completed') NOT NULL DEFAULT 'published',
+    payment_status ENUM('not_required','pending','approved','rejected') NOT NULL DEFAULT 'not_required',
+    payment_reference VARCHAR(100) NULL,
+    publish_fee_eur DECIMAL(10,2) NULL,
+    payment_admin_notes TEXT NULL,
+    payment_processed_by INT UNSIGNED NULL,
+    payment_processed_at DATETIME NULL,
     is_featured TINYINT(1) NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (payment_processed_by) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS competition_registrations (
@@ -291,18 +308,66 @@ CREATE TABLE IF NOT EXISTS competition_registrations (
     FOREIGN KEY (bird_id) REFERENCES birds(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS event_announcements (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    description TEXT NULL,
+    event_type ENUM('gathering','assembly','meeting','exhibition','social','other') NOT NULL DEFAULT 'gathering',
+    event_date DATE NOT NULL,
+    event_end_date DATE NULL,
+    registration_deadline DATE NULL,
+    location VARCHAR(255) NULL,
+    latitude DECIMAL(10,7) NULL,
+    longitude DECIMAL(10,7) NULL,
+    organizer VARCHAR(200) NULL,
+    club_name VARCHAR(150) NULL,
+    max_participants INT UNSIGNED NULL,
+    attendance_fee_eur DECIMAL(10,2) NULL,
+    contact_email VARCHAR(255) NULL,
+    contact_phone VARCHAR(30) NULL,
+    status ENUM('draft','published','cancelled','completed') NOT NULL DEFAULT 'published',
+    payment_status ENUM('not_required','pending','approved','rejected') NOT NULL DEFAULT 'not_required',
+    payment_reference VARCHAR(100) NULL,
+    publish_fee_eur DECIMAL(10,2) NULL,
+    payment_admin_notes TEXT NULL,
+    payment_processed_by INT UNSIGNED NULL,
+    payment_processed_at DATETIME NULL,
+    is_featured TINYINT(1) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (payment_processed_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS event_registrations (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    event_id INT UNSIGNED NOT NULL,
+    user_id INT UNSIGNED NOT NULL,
+    notes TEXT NULL,
+    status ENUM('registered','confirmed','withdrawn') NOT NULL DEFAULT 'registered',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_event_user (event_id, user_id),
+    FOREIGN KEY (event_id) REFERENCES event_announcements(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- Default plans
-INSERT INTO subscription_plans (name, slug, description, price_bgn, duration_days, max_birds, max_lofts, features, sort_order) VALUES
-('Безплатен', 'free', 'До 10 птици и 1 птичарник', 0, 36500, 10, 1, '["birds","lofts","basic_health"]', 0),
-('Стандарт', 'standard', 'До 100 птици, GPS, карта, обяви', 29.99, 30, 100, 5, '["birds","lofts","breeding","training","health","competitions","gps_tracking","map"]', 1),
-('Професионален', 'pro', 'Всичко + родословна, аналитика', 59.99, 30, NULL, NULL, '["all","pedigree_export","public_pedigree","analytics","gps_tracking","map","announcements"]', 2);
+INSERT INTO subscription_plans (name, slug, description, price_eur, duration_days, max_birds, max_lofts, features, sort_order) VALUES
+('Безплатен', 'free', 'До 5 птици', 0, 0, 5, 1, '["birds","lofts","basic_health"]', 0),
+('Ограничен', 'limited', 'До 20 птици', 20.00, 30, 20, NULL, '["birds","lofts","breeding","health","training"]', 1),
+('Стандарт', 'standard', 'До 50 птици', 40.00, 30, 50, NULL, '["birds","lofts","breeding","training","health","competitions","gps_tracking","map"]', 2),
+('Най използван', 'popular', 'До 100 птици', 70.00, 30, 100, NULL, '["birds","lofts","breeding","training","health","competitions","gps_tracking","map","announcements"]', 3),
+('Професионален', 'pro', 'Неограничени птици, родословно дърво, експорт', 100.00, 30, NULL, NULL, '["all","pedigree_export","public_pedigree","analytics","gps_tracking","map","announcements"]', 4);
 
 INSERT INTO settings (`key`, `value`) VALUES
-('app_version', '2.0.0'),
+('app_version', '2.1.4'),
 ('app_installed', '0'),
 ('maintenance_mode', '0'),
 ('site_name', 'Best Sport Byrds'),
 ('contact_email', 'filipovrz@gmail.com'),
-('payment_instructions', 'Банков превод или Revolut — посочете имейла си в основанието.');
+('payment_instructions', 'Банков превод или Revolut — посочете имейла си в основанието.'),
+('announcement_publish_fee_eur', '10.00'),
+('event_publish_fee_eur', '5.00');

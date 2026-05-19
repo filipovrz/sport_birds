@@ -12,6 +12,13 @@ final class Migrator
     /** @var array<string, string> version => sql file */
     private const PHASES = [
         '2.0.0' => 'phase2.sql',
+        '2.1.0' => 'phase3.sql',
+        '2.1.1' => 'phase3_1.sql',
+        '2.1.2' => 'phase3_2.sql',
+        '2.1.3' => 'phase3_3.sql',
+        '2.1.4' => 'phase3_4.sql',
+        '2.1.5' => 'phase3_5.sql',
+        '2.1.6' => 'phase3_6.sql',
     ];
 
     public static function currentVersion(): string

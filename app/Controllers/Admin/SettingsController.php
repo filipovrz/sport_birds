@@ -30,6 +30,20 @@ final class SettingsController extends Controller
                 );
             }
         }
+        if (isset($_POST['announcement_publish_fee_eur'])) {
+            $fee = max(0, (float) $_POST['announcement_publish_fee_eur']);
+            Database::query(
+                'INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)',
+                ['announcement_publish_fee_eur', number_format($fee, 2, '.', '')]
+            );
+        }
+        if (isset($_POST['event_publish_fee_eur'])) {
+            $fee = max(0, (float) $_POST['event_publish_fee_eur']);
+            Database::query(
+                'INSERT INTO settings (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`)',
+                ['event_publish_fee_eur', number_format($fee, 2, '.', '')]
+            );
+        }
         Session::flash('success', 'Настройките са запазени.');
         $this->redirect('/admin/settings');
     }

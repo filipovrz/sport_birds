@@ -2,7 +2,7 @@
 <div class="card"><form method="post" action="/dashboard/training">
     <?= csrf_field() ?>
 <div class="form-group"><label>Дата</label><input type="date" name="session_date" value="<?= date('Y-m-d') ?>"></div>
-<div class="form-group"><label>Птицарник</label>
+<div class="form-group"><label>Гълъбарник</label>
 <select name="loft_id"><option value="">—</option>
 <?php foreach ($lofts as $l): ?><option value="<?= (int)$l['id'] ?>"><?= htmlspecialchars($l['name']) ?></option><?php endforeach; ?>
 </select></div>

@@ -13,7 +13,7 @@
     </div>
 
     <h1>Best Sport Byrds</h1>
-    <p class="lead">Главен портал за локално тестване — всички страници на приложението на едно място.</p>
+    <p class="lead">Карта на всички страници — за разработка и бързо тестване на приложението.</p>
 
     <div class="hub-quick">
         <?php if (!$installed): ?>
@@ -73,8 +73,8 @@
         <?php foreach ($plans as $plan): ?>
         <div class="card" style="margin:0">
             <h3><?= htmlspecialchars($plan['name']) ?></h3>
-            <p class="num" style="font-size:1.5rem;font-weight:700;color:var(--primary)"><?= number_format((float)$plan['price_bgn'], 2) ?> лв.</p>
-            <p style="font-size:0.9rem;color:var(--muted)"><?= htmlspecialchars($plan['description'] ?? '') ?></p>
+            <p class="num" style="font-size:1.5rem;font-weight:700;color:var(--primary)"><?= format_plan_price($plan) ?><?= format_plan_price_suffix($plan) ?></p>
+            <p style="font-size:0.9rem;color:var(--muted)"><?= format_plan_period($plan) ?><?= ($plan['description'] ?? '') ? ' · ' . htmlspecialchars($plan['description']) : '' ?></p>
         </div>
         <?php endforeach; ?>
     </div>

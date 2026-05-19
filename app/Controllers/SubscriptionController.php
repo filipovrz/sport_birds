@@ -15,15 +15,21 @@ final class SubscriptionController extends Controller
     public function index(): void
     {
         $settings = Database::fetch("SELECT `value` FROM settings WHERE `key` = 'payment_instructions'");
+        $user = Auth::user();
+        $pending = Database::fetch(
+            'SELECT sr.*, p.name AS plan_name FROM subscription_requests sr
+             JOIN subscription_plans p ON p.id = sr.plan_id
+             WHERE sr.user_id = ? AND sr.status = "pending" ORDER BY sr.id DESC LIMIT 1',
+            [Auth::id()]
+        );
         $this->view('subscription.index', [
             'plans' => SubscriptionService::plans(),
-            'current' => SubscriptionService::currentPlan(Auth::user()),
+            'current' => SubscriptionService::currentPlan($user),
             'isPremium' => Auth::hasPremium(),
+            'activePlanPrice' => SubscriptionService::activePaidPlanPrice($user),
             'paymentInstructions' => $settings['value'] ?? '',
-            'pending' => Database::fetch(
-                'SELECT * FROM subscription_requests WHERE user_id = ? AND status = "pending" ORDER BY id DESC LIMIT 1',
-                [Auth::id()]
-            ),
+            'pending' => $pending,
+            'pendingPlanName' => $pending['plan_name'] ?? null,
         ]);
     }
 
@@ -34,6 +40,12 @@ final class SubscriptionController extends Controller
         if (!$plan || $plan['slug'] === 'free') {
             Session::flash('error', 'Невалиден план.');
             $this->back();
+        }
+        $user = Auth::user();
+        $block = SubscriptionService::planRequestBlockReason($user, $plan);
+        if ($block !== null) {
+            Session::flash('error', $block);
+            $this->redirect('/dashboard/subscription');
         }
         Database::insert('subscription_requests', [
             'user_id' => Auth::id(),

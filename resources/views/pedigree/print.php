@@ -2,7 +2,7 @@
 <html lang="bg">
 <head>
     <meta charset="UTF-8">
-    <title>Родословна — <?= htmlspecialchars($bird['ring_number']) ?></title>
+    <title>Родословие — <?= htmlspecialchars($bird['ring_number']) ?></title>
     <link rel="stylesheet" href="/assets/css/app.css">
     <style>
         @media print { .no-print { display: none; } body { background: #fff; } }
@@ -13,7 +13,7 @@
 <body>
 <div class="cert">
     <p class="no-print" style="text-align:center"><button onclick="window.print()" class="btn btn-primary">Печат / Запази като PDF</button></p>
-    <h1>Best Sport Byrds — Родословна</h1>
+    <h1>Best Sport Byrds — Родословие</h1>
     <p style="text-align:center"><strong><?= htmlspecialchars($bird['ring_number']) ?></strong>
         <?= $bird['name'] ? ' — ' . htmlspecialchars($bird['name']) : '' ?></p>
     <?php if ($inbreeding !== null): ?><p style="text-align:center">Коефициент на инбридинг: <?= $inbreeding ?></p><?php endif; ?>

@@ -47,6 +47,7 @@ final class BirdController extends Controller
         }
         try {
             $data = $this->birdData();
+            $this->validateParents($data);
             $data['user_id'] = Auth::id();
             if (!empty($_FILES['photo']['name'])) {
                 $data['photo_path'] = UploadService::storeBirdPhoto($_FILES['photo'], Auth::id());
@@ -90,6 +91,7 @@ final class BirdController extends Controller
         }
         try {
             $data = $this->birdData();
+            $this->validateParents($data, (int) $id);
             if (!empty($_FILES['photo']['name'])) {
                 UploadService::delete($bird['photo_path']);
                 $data['photo_path'] = UploadService::storeBirdPhoto($_FILES['photo'], Auth::id());
@@ -118,6 +120,36 @@ final class BirdController extends Controller
         $this->redirect('/dashboard/birds');
     }
 
+    /** @param array<string, mixed> $data */
+    private function validateParents(array $data, int $excludeBirdId = 0): void
+    {
+        $userId = Auth::id();
+        $fatherId = !empty($data['father_id']) ? (int) $data['father_id'] : 0;
+        $motherId = !empty($data['mother_id']) ? (int) $data['mother_id'] : 0;
+
+        if ($fatherId) {
+            if ($excludeBirdId && $fatherId === $excludeBirdId) {
+                throw new \RuntimeException('Птицата не може да е баща на самата себе си.');
+            }
+            $father = Bird::findOwned($fatherId, $userId);
+            if (!$father || ($father['sex'] ?? '') !== 'male') {
+                throw new \RuntimeException('Бащата трябва да е птица, маркирана като мъжка.');
+            }
+        }
+        if ($motherId) {
+            if ($excludeBirdId && $motherId === $excludeBirdId) {
+                throw new \RuntimeException('Птицата не може да е майка на самата себе си.');
+            }
+            $mother = Bird::findOwned($motherId, $userId);
+            if (!$mother || ($mother['sex'] ?? '') !== 'female') {
+                throw new \RuntimeException('Майката трябва да е птица, маркирана като женска.');
+            }
+        }
+        if ($fatherId && $motherId && $fatherId === $motherId) {
+            throw new \RuntimeException('Бащата и майката не могат да са една и съща птица.');
+        }
+    }
+
     /** @return array<string, mixed> */
     private function birdData(): array
     {
@@ -136,6 +168,7 @@ final class BirdController extends Controller
             'mother_id' => ($_POST['mother_id'] ?? '') ? (int) $_POST['mother_id'] : null,
             'notes' => trim($_POST['notes'] ?? '') ?: null,
             'is_public_pedigree' => isset($_POST['is_public_pedigree']) ? 1 : 0,
+            'is_public' => isset($_POST['is_public']) ? 1 : 0,
         ];
     }
 }

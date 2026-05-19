@@ -1,5 +1,5 @@
 <div class="hero" style="padding:1.5rem">
-    <h1>Публична родословна</h1>
+    <h1>Публично родословие</h1>
     <p><?= htmlspecialchars($bird['ring_number']) ?> <?= $bird['name'] ? '— '.htmlspecialchars($bird['name']) : '' ?></p>
     <?php if ($owner): ?><p style="color:var(--muted)">Собственик: <?= htmlspecialchars($owner['name']) ?><?= $owner['club_name'] ? ' · '.htmlspecialchars($owner['club_name']) : '' ?></p><?php endif; ?>
 </div>

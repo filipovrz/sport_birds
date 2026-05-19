@@ -50,18 +50,21 @@ final class InstallController extends Controller
             $this->runSchema($pdo, $schema);
 
             $hash = password_hash($adminPass, PASSWORD_DEFAULT);
+            $proPlan = $pdo->query("SELECT id, duration_days FROM subscription_plans WHERE slug = 'pro' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+            $proPlanId = $proPlan ? (int) $proPlan['id'] : null;
+            $proDays = max(30, (int) ($proPlan['duration_days'] ?? 30));
             $pdo->prepare(
-                'INSERT INTO users (email, password, name, role, user_type, bird_specialties, subscription_plan_id, subscription_expires_at)
-                 VALUES (?, ?, ?, \'super_admin\', \'owner,competitor,breeder\', \'racing_pigeon,sport_pigeon,gamecock,other_sport_bird\', 3, DATE_ADD(NOW(), INTERVAL 10 YEAR))
-                 ON DUPLICATE KEY UPDATE password = VALUES(password), role = \'super_admin\''
-            )->execute([$adminEmail, $hash, $adminName]);
+                'INSERT INTO users (email, password, name, role, user_type, bird_specialties, subscription_plan_id, subscription_expires_at, email_verified_at, terms_accepted_at, age_confirmed_at)
+                 VALUES (?, ?, ?, \'super_admin\', \'owner,competitor,breeder\', \'racing_pigeon,sport_pigeon,other_sport_bird\', ?, DATE_ADD(NOW(), INTERVAL ' . $proDays . ' DAY), NOW(), NOW(), NOW())
+                 ON DUPLICATE KEY UPDATE password = VALUES(password), role = \'super_admin\', email_verified_at = COALESCE(email_verified_at, NOW())'
+            )->execute([$adminEmail, $hash, $adminName, $proPlanId]);
 
             $env = "APP_ENV={$appEnv}\nAPP_DEBUG={$appDebug}\nAPP_URL=" . ($_POST['app_url'] ?? '') . "\n";
             $env .= "DB_HOST={$host}\nDB_PORT={$port}\nDB_DATABASE={$name}\nDB_USERNAME={$user}\nDB_PASSWORD={$pass}\n";
             file_put_contents(BASE_PATH . '/.env', $env);
 
             $pdo->prepare("INSERT INTO settings (`key`, `value`) VALUES ('app_installed', '1') ON DUPLICATE KEY UPDATE `value` = '1'")->execute();
-            $pdo->prepare("INSERT INTO settings (`key`, `value`) VALUES ('app_version', '2.0.0') ON DUPLICATE KEY UPDATE `value` = '2.0.0'")->execute();
+            $pdo->prepare("INSERT INTO settings (`key`, `value`) VALUES ('app_version', '2.1.2') ON DUPLICATE KEY UPDATE `value` = '2.1.2'")->execute();
             $pdo->prepare("INSERT INTO settings (`key`, `value`) VALUES ('maintenance_mode', '0') ON DUPLICATE KEY UPDATE `value` = '0'")->execute();
 
             $this->view('install.success', ['admin_email' => $adminEmail], 'layouts.guest');

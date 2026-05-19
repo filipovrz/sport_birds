@@ -1,4 +1,4 @@
-<div style="display:flex;justify-content:space-between"><h1>Птицарни</h1><a href="/dashboard/lofts/create" class="btn btn-primary">+ Добави</a></div>
+<div style="display:flex;justify-content:space-between"><h1>Гълъбарници</h1><a href="/dashboard/lofts/create" class="btn btn-primary">+ Добави</a></div>
 <div class="card"><table>
 <tr><th>Име</th><th>Локация</th><th>Птици</th><th></th></tr>
 <?php foreach ($lofts as $l): ?>
