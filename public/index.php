@@ -27,8 +27,8 @@ $csrf = [CsrfMiddleware::class];
 $router->get('/install', 'InstallController@index', $mw);
 $router->post('/install', 'InstallController@run', array_merge($mw, [InstallLockMiddleware::class], $csrf));
 
-// Public
-$router->get('/', 'HomeController@index', array_merge($mw, $installed));
+// Главен портал (тест индекс) — без изискване за инсталация
+$router->get('/', 'HomeController@index', $mw);
 $router->get('/pricing', 'HomeController@pricing', array_merge($mw, $installed));
 $router->get('/pedigree/public/{id}', 'PublicPedigreeController@show', $mw);
 $router->get('/announcements', 'AnnouncementController@index', array_merge($mw, $installed));

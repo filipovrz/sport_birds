@@ -6,7 +6,7 @@
     <title><?= htmlspecialchars($config['name']) ?> — Табло</title>
     <link rel="stylesheet" href="/assets/css/app.css">
 </head>
-<body>
+<body class="app-shell">
 <header class="site-header">
     <div class="container" style="display:flex;justify-content:space-between;align-items:center;width:100%;">
         <a href="/dashboard" class="brand"><?= htmlspecialchars($config['name']) ?> <small style="font-size:0.65em;opacity:0.85">v<?= htmlspecialchars($config['version'] ?? '1') ?></small></a>
@@ -21,6 +21,7 @@
 </header>
 <main class="container sidebar-layout">
     <aside class="sidebar">
+        <a href="/">← Портал / тест</a>
         <a href="/dashboard">Табло</a>
         <a href="/dashboard/lofts">Птичарници</a>
         <a href="/dashboard/birds">Птици</a>

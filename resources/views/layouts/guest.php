@@ -6,11 +6,12 @@
     <title><?= htmlspecialchars($config['name']) ?></title>
     <link rel="stylesheet" href="/assets/css/app.css">
 </head>
-<body>
+<body class="app-shell">
 <header class="site-header">
     <div class="container" style="display:flex;justify-content:space-between;align-items:center;width:100%;">
         <a href="/" class="brand"><?= htmlspecialchars($config['name']) ?></a>
         <nav>
+            <a href="/">Портал</a>
             <a href="/pricing">Цени</a>
             <a href="/announcements">Състезания</a>
             <?php if ($user): ?>
