@@ -47,12 +47,16 @@ final class CheckoutFlowService
     /** @return list<array{slug: string, label: string, automatic: bool}> */
     public static function methodsForForms(): array
     {
-        $configured = PaymentGatewayRegistry::availableForCheckout();
-        if ($configured !== []) {
-            return $configured;
+        $out = [];
+        foreach (PaymentMethodsService::catalog(true) as $m) {
+            $out[] = [
+                'slug' => $m['slug'],
+                'label' => $m['label'],
+                'automatic' => $m['automatic'],
+            ];
         }
 
-        return [
+        return $out !== [] ? $out : [
             ['slug' => 'bank', 'label' => 'Банков превод', 'automatic' => false],
         ];
     }

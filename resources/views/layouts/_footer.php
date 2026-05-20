@@ -1,5 +1,6 @@
 ﻿<?php
 use App\Services\FooterService;
+use App\Services\PaymentMethodsService;
 use App\Services\SettingsService;
 
 $footer = FooterService::config();
@@ -16,13 +17,14 @@ if ($copyright === '') {
 $company = $footer['company'] ?? [];
 $companyLines = FooterService::companyLines($company);
 $hasCompany = $companyLines !== [];
+$paymentMethods = PaymentMethodsService::catalog(false);
 $linkColumns = [];
 foreach ($footer['columns'] ?? [] as $col) {
     if (!empty($col['links'])) {
         $linkColumns[] = $col;
     }
 }
-$navCount = ($hasCompany ? 1 : 0) + count($linkColumns);
+$navCount = ($hasCompany ? 1 : 0) + count($linkColumns) + 1;
 ?>
 <footer class="site-footer">
     <div class="container site-footer__grid">
@@ -74,6 +76,15 @@ $navCount = ($hasCompany ? 1 : 0) + count($linkColumns);
                 </ul>
             </div>
             <?php endforeach; ?>
+            <div class="site-footer__col site-footer__col--payments">
+                <h3>Начини на плащане</h3>
+                <ul>
+                    <?php foreach ($paymentMethods as $pm): ?>
+                    <li><a href="<?= htmlspecialchars(PaymentMethodsService::methodUrl($pm['slug'])) ?>"><?= htmlspecialchars($pm['label']) ?></a></li>
+                    <?php endforeach; ?>
+                    <li><a href="/payment-methods">Всички методи →</a></li>
+                </ul>
+            </div>
         </div>
         <?php endif; ?>
     </div>

@@ -564,43 +564,89 @@ textarea { min-height: 90px; }
 .site-footer__col a:hover {
   color: var(--primary);
 }
-.site-footer__payment-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.site-footer__col--payments ul li {
+  margin-bottom: 0.28rem;
 }
-.site-footer__payment-list li {
-  margin-bottom: 0.4rem;
-  font-size: 0.88rem;
-  line-height: 1.4;
+.payment-page {
+  max-width: 960px;
+  margin: 0 auto;
 }
-.site-footer__payment-name {
-  display: block;
-  color: var(--text);
-  font-weight: 500;
-}
-.site-footer__payment-badge {
-  display: inline-block;
-  margin-top: 0.15rem;
-  padding: 0.1rem 0.45rem;
-  border-radius: 4px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: lowercase;
-}
-.site-footer__payment-badge--auto {
-  background: #dcfce7;
-  color: #166534;
-}
-.site-footer__payment-badge--manual {
-  background: #fef3c7;
-  color: #92400e;
-}
-.site-footer__payment-note {
-  margin: 0.65rem 0 0;
-  font-size: 0.82rem;
+.payment-page__lead {
   color: var(--muted);
-  line-height: 1.45;
+  margin-bottom: 1.5rem;
+}
+.payment-page__note {
+  margin-top: 1.5rem;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+.payment-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+}
+.payment-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.1rem 0.75rem 1rem;
+  text-decoration: none;
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+.payment-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+.payment-card--inactive {
+  opacity: 0.55;
+}
+.payment-card__logo {
+  width: 72px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  margin-bottom: 0.65rem;
+}
+.payment-card__logo--bank { background: #e8f4fc; color: #1e5a8a; }
+.payment-card__logo--card { background: #1a1f71; color: #fff; }
+.payment-card__logo--epay { background: #fff3e0; color: #c45c00; }
+.payment-card__logo--paypal { background: #003087; color: #ffc439; font-size: 0.75rem; }
+.payment-card__logo--revolut { background: #191c1f; color: #fff; font-size: 0.7rem; }
+.payment-card__name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+.payment-card__timing {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 0.75rem;
+}
+.payment-card__btn {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+}
+.payment-detail__bank {
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
 }
 .site-footer__company-list {
   list-style: none;

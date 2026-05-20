@@ -109,7 +109,6 @@ final class FooterService
             ['label' => 'GDPR', 'url' => '/legal/gdpr'],
             ['label' => 'Условия за ползване', 'url' => '/legal/terms'],
             ['label' => 'Бисквитки', 'url' => '/legal/cookies'],
-            ['label' => 'Начини на плащане', 'url' => '/payment-methods'],
         ];
         foreach ($columns as &$col) {
             if (($col['title'] ?? '') !== 'Правни документи') {

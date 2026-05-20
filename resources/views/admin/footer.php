@@ -34,7 +34,7 @@
     <div class="form-group"><label>Адрес</label><textarea name="company_address" rows="2"><?= htmlspecialchars($co['address'] ?? '') ?></textarea></div>
     <div class="form-group"><label>Друго</label><textarea name="company_other" rows="2"><?= htmlspecialchars($co['other'] ?? '') ?></textarea></div>
     <input type="hidden" name="company_title" value="<?= htmlspecialchars($co['title'] ?? 'Информация') ?>">
-    <p style="color:var(--muted);font-size:0.9rem;margin:1rem 0">Плащания: страница <a href="/payment-methods" target="_blank">/payment-methods</a> (линк в колона „Правни документи“). IBAN и gateway — <a href="/admin/settings">Настройки</a>.</p>
+    <p style="color:var(--muted);font-size:0.9rem;margin:1rem 0">Колона „Начини на плащане“ във футъра се попълва автоматично. IBAN и gateway — <a href="/admin/settings">Настройки</a>.</p>
     <hr style="margin:1.5rem 0;border:none;border-top:1px solid var(--border)">
     <h2 style="margin-top:0;font-size:1.1rem">Колони с връзки</h2>
     <p style="color:var(--muted);font-size:0.9rem">На всеки ред: <code>Етикет | /път</code> (напр. правни страници). Колона „Информация“ се попълва от секцията по-горе.</p>

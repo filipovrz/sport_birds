@@ -31,6 +31,7 @@ final class SubscriptionController extends Controller
             'activePlanPrice' => SubscriptionService::activePaidPlanPrice($user),
             'paymentInstructions' => $paymentInstructions,
             'paymentMethods' => CheckoutFlowService::methodsForForms(),
+            'selectedPaymentMethod' => trim((string) ($_GET['payment_method'] ?? 'bank')),
             'pending' => $pending,
             'pendingPlanName' => $pending['plan_name'] ?? null,
         ]);

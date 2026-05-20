@@ -240,3 +240,15 @@ function format_plan_price_suffix(array $plan): string
 
     return '';
 }
+
+function payment_icon_text(string $icon): string
+{
+    return match ($icon) {
+        'bank' => 'BANK',
+        'card' => 'VISA',
+        'epay' => 'ePay',
+        'paypal' => 'PayPal',
+        'revolut' => 'Revolut',
+        default => '€',
+    };
+}

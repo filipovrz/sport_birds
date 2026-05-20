@@ -4,60 +4,80 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Services\Payment\PaymentGatewayRegistry;
+
 /**
- * Единен източник за начини на плащане (футър, абонаменти, обяви).
+ * Каталог начини на плащане — футър, страница /payment-methods, форми.
  */
 final class PaymentMethodsService
 {
-    /** @return list<array{name: string, automatic: bool, note: string}> */
-    public static function defaults(): array
+    /** @return list<array{slug: string, label: string, timing: string, automatic: bool, icon: string, active: bool}> */
+    public static function catalog(bool $onlyActive = false): array
     {
-        return [
+        $items = [
             [
-                'name' => 'Банков превод',
+                'slug' => 'bank',
+                'label' => 'Банков превод',
+                'timing' => 'До 1 работен ден',
                 'automatic' => false,
-                'note' => 'Одобрение от администратор след постъпване на сумата',
+                'icon' => 'bank',
             ],
             [
-                'name' => 'Кредитна/дебитна карта',
+                'slug' => 'stripe',
+                'label' => 'Visa / Mastercard',
+                'timing' => 'Веднага',
                 'automatic' => true,
-                'note' => 'Автоматично отчитане',
+                'icon' => 'card',
             ],
             [
-                'name' => 'ePay.bg',
+                'slug' => 'epay',
+                'label' => 'ePay.bg',
+                'timing' => 'Веднага',
                 'automatic' => true,
-                'note' => 'Автоматично отчитане',
+                'icon' => 'epay',
             ],
             [
-                'name' => 'Други интегрирани методи',
+                'slug' => 'paypal',
+                'label' => 'PayPal',
+                'timing' => 'Веднага',
                 'automatic' => true,
-                'note' => 'При налична интеграция',
+                'icon' => 'paypal',
+            ],
+            [
+                'slug' => 'revolut',
+                'label' => 'Revolut Pay',
+                'timing' => 'Веднага',
+                'automatic' => true,
+                'icon' => 'revolut',
             ],
         ];
-    }
 
-    public static function footerNote(): string
-    {
-        return 'Всички плащания освен банковия превод се обработват автоматично '
-            . 'и потребителят получава заявената услуга или достъп.';
-    }
-
-    /** @return list<array{name: string, automatic: bool, note: string}> */
-    /** @deprecated Футърът вече не показва списък — виж /payment-methods */
-    public static function forFooter(): array
-    {
-        return self::defaults();
-    }
-
-    /** Текст за форми (абонамент, обяви) — банкови реквизити + методи. */
-    public static function instructionsForForms(): string
-    {
-        $custom = trim(SettingsService::get('payment_instructions', '') ?? '');
-        if ($custom !== '' && !self::looksLikeAccidentalPaste($custom)) {
-            return $custom . "\n\nПодробности: " . self::methodsPageUrl();
+        $out = [];
+        foreach ($items as $item) {
+            $item['active'] = $item['slug'] === 'bank' || PaymentGatewayRegistry::get($item['slug']) !== null;
+            if (!$onlyActive || $item['active']) {
+                $out[] = $item;
+            }
         }
 
-        return 'Начин на плащане избирате при заявката. Подробности: ' . self::methodsPageUrl();
+        return $out;
+    }
+
+    /** @return array{slug: string, label: string, timing: string, automatic: bool, icon: string, active: bool}|null */
+    public static function find(string $slug): ?array
+    {
+        foreach (self::catalog(false) as $item) {
+            if ($item['slug'] === $slug) {
+                return $item;
+            }
+        }
+
+        return null;
+    }
+
+    public static function methodUrl(string $slug): string
+    {
+        return '/payment-methods/' . rawurlencode($slug);
     }
 
     public static function methodsPageUrl(): string
@@ -67,66 +87,24 @@ final class PaymentMethodsService
         return rtrim((string) ($cfg['url'] ?? ''), '/') . '/payment-methods';
     }
 
-    /** @param list<array<string, mixed>> $list */
-    public static function sanitizeList(array $list): array
+    public static function continueUrl(string $slug): string
     {
-        $out = [];
-        foreach ($list as $item) {
-            if (!is_array($item)) {
-                continue;
-            }
-            $name = trim((string) ($item['name'] ?? ''));
-            if ($name === '') {
-                continue;
-            }
-            $out[] = [
-                'name' => $name,
-                'automatic' => !empty($item['automatic']),
-                'note' => trim((string) ($item['note'] ?? '')),
-            ];
+        if (\App\Core\Auth::check()) {
+            return '/dashboard/subscription?payment_method=' . rawurlencode($slug);
         }
 
-        return $out !== [] ? $out : self::defaults();
+        return '/login?redirect=' . rawurlencode(self::methodUrl($slug));
     }
 
-    /** @param list<string> $lines */
-    public static function fromTextLines(string $lines): array
+    /** Текст за форми — само банкови реквизити + линк. */
+    public static function instructionsForForms(): string
     {
-        $methods = [];
-        foreach (preg_split('/\r\n|\n|\r/', $lines) as $line) {
-            $line = trim($line);
-            if ($line === '' || self::isNoteLine($line)) {
-                continue;
-            }
-            $automatic = !preg_match('/банков|превод/i', $line);
-            $name = trim(preg_replace('/\s*[\-—].*$/u', '', $line));
-            if ($name === '' || mb_strlen($name) > 60) {
-                continue;
-            }
-            $methods[] = [
-                'name' => $name,
-                'automatic' => $automatic,
-                'note' => '',
-            ];
+        $custom = trim(SettingsService::get('payment_instructions', '') ?? '');
+        if ($custom !== '' && !self::looksLikeAccidentalPaste($custom)) {
+            return $custom . "\n\nВсички методи: " . self::methodsPageUrl();
         }
 
-        return self::sanitizeList($methods);
-    }
-
-    public static function isNoteLine(string $line): bool
-    {
-        return (bool) preg_match('/всички плащания|получава заявен|автоматично отчитане|ручно одобрение/i', $line)
-            || str_contains($line, 'стават:');
-    }
-
-    public static function methodsToText(array $methods): string
-    {
-        $lines = [];
-        foreach ($methods as $m) {
-            $lines[] = $m['name'];
-        }
-
-        return implode("\n", $lines);
+        return 'Изберете начин при плащане. Подробности: ' . self::methodsPageUrl();
     }
 
     public static function looksLikeAccidentalPaste(string $text): bool
@@ -136,21 +114,14 @@ final class PaymentMethodsService
             || str_contains($text, 'копирал');
     }
 
-    public static function saveFromPost(array $post): void
+    /** @deprecated */
+    public static function forFooter(): array
     {
-        $methods = self::fromTextLines(trim($post['payment_methods_lines'] ?? ''));
-        SettingsService::set('payment_methods_json', json_encode($methods, JSON_UNESCAPED_UNICODE));
-        SettingsService::set('payment_footer_note', trim($post['payment_footer_note'] ?? ''));
-        $bank = trim($post['payment_instructions'] ?? '');
-        if ($bank !== '' && !self::looksLikeAccidentalPaste($bank)) {
-            SettingsService::set('payment_instructions', $bank);
-        }
+        return [];
     }
 
-    public static function footerNoteStored(): string
+    public static function footerNote(): string
     {
-        $n = trim(SettingsService::get('payment_footer_note', '') ?? '');
-
-        return $n !== '' ? $n : self::footerNote();
+        return '';
     }
 }
