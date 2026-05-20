@@ -1,6 +1,5 @@
 ﻿<?php
 use App\Services\FooterService;
-use App\Services\PaymentMethodsService;
 use App\Services\SettingsService;
 
 $footer = FooterService::config();
@@ -23,10 +22,7 @@ foreach ($footer['columns'] ?? [] as $col) {
         $linkColumns[] = $col;
     }
 }
-$paymentMethods = PaymentMethodsService::forFooter();
-$paymentNote = PaymentMethodsService::footerNoteStored();
-$hasPayment = $paymentMethods !== [];
-$navCount = ($hasCompany ? 1 : 0) + count($linkColumns) + ($hasPayment ? 1 : 0);
+$navCount = ($hasCompany ? 1 : 0) + count($linkColumns);
 ?>
 <footer class="site-footer">
     <div class="container site-footer__grid">
@@ -78,26 +74,6 @@ $navCount = ($hasCompany ? 1 : 0) + count($linkColumns) + ($hasPayment ? 1 : 0);
                 </ul>
             </div>
             <?php endforeach; ?>
-            <?php if ($hasPayment): ?>
-            <div class="site-footer__col site-footer__col--payment">
-                <h3><?= htmlspecialchars($footer['payment_title'] ?? 'Начини на плащане') ?></h3>
-                <ul class="site-footer__payment-list">
-                    <?php foreach ($paymentMethods as $method): ?>
-                    <li>
-                        <span class="site-footer__payment-name"><?= htmlspecialchars($method['name']) ?></span>
-                        <?php if (!empty($method['automatic'])): ?>
-                        <span class="site-footer__payment-badge site-footer__payment-badge--auto">автоматично</span>
-                        <?php else: ?>
-                        <span class="site-footer__payment-badge site-footer__payment-badge--manual">ръчно одобрение</span>
-                        <?php endif; ?>
-                    </li>
-                    <?php endforeach; ?>
-                </ul>
-                <?php if ($paymentNote !== ''): ?>
-                <p class="site-footer__payment-note"><?= htmlspecialchars($paymentNote) ?></p>
-                <?php endif; ?>
-            </div>
-            <?php endif; ?>
         </div>
         <?php endif; ?>
     </div>

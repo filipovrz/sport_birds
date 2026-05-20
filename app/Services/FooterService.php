@@ -70,7 +70,11 @@ final class FooterService
         $cfg['columns'] = array_values(array_filter(
             $cfg['columns'] ?? [],
             static function (array $col): bool {
-                if (($col['title'] ?? '') !== 'Информация') {
+                $title = (string) ($col['title'] ?? '');
+                if (preg_match('/начини на плащане|плащан/i', $title)) {
+                    return false;
+                }
+                if ($title !== 'Информация') {
                     return true;
                 }
                 $labels = array_column($col['links'] ?? [], 'label');
@@ -105,6 +109,7 @@ final class FooterService
             ['label' => 'GDPR', 'url' => '/legal/gdpr'],
             ['label' => 'Условия за ползване', 'url' => '/legal/terms'],
             ['label' => 'Бисквитки', 'url' => '/legal/cookies'],
+            ['label' => 'Начини на плащане', 'url' => '/payment-methods'],
         ];
         foreach ($columns as &$col) {
             if (($col['title'] ?? '') !== 'Правни документи') {
@@ -220,8 +225,6 @@ final class FooterService
         ];
 
         SettingsService::set('footer_json', json_encode($config, JSON_UNESCAPED_UNICODE));
-
-        PaymentMethodsService::saveFromPost($post);
 
         foreach (['privacy' => 'page_privacy_html', 'terms' => 'page_terms_html', 'cookies' => 'page_cookies_html', 'gdpr' => 'page_gdpr_html'] as $slug => $key) {
             if (isset($post['legal_' . $slug])) {

@@ -43,26 +43,9 @@ final class PaymentMethodsService
     }
 
     /** @return list<array{name: string, automatic: bool, note: string}> */
+    /** @deprecated Футърът вече не показва списък — виж /payment-methods */
     public static function forFooter(): array
     {
-        $raw = SettingsService::get('payment_methods_json', '');
-        if ($raw !== null && trim($raw) !== '') {
-            $decoded = json_decode($raw, true);
-            if (is_array($decoded) && $decoded !== []) {
-                return self::sanitizeList($decoded);
-            }
-        }
-
-        $footer = FooterService::rawConfig();
-        if (!empty($footer['payment_methods']) && is_array($footer['payment_methods'])) {
-            return self::sanitizeList($footer['payment_methods']);
-        }
-
-        $text = trim((string) ($footer['payment_text'] ?? ''));
-        if ($text !== '' && !self::looksLikeAccidentalPaste($text)) {
-            return self::fromTextLines($text);
-        }
-
         return self::defaults();
     }
 
@@ -70,20 +53,18 @@ final class PaymentMethodsService
     public static function instructionsForForms(): string
     {
         $custom = trim(SettingsService::get('payment_instructions', '') ?? '');
-        $bankBlock = '';
         if ($custom !== '' && !self::looksLikeAccidentalPaste($custom)) {
-            $bankBlock = $custom . "\n\n";
+            return $custom . "\n\nПодробности: " . self::methodsPageUrl();
         }
 
-        $lines = ["Начини на плащане:"];
-        foreach (self::forFooter() as $m) {
-            $tag = $m['automatic'] ? 'автоматично' : 'ръчно одобрение';
-            $lines[] = '• ' . $m['name'] . ' — ' . $tag;
-        }
-        $lines[] = '';
-        $lines[] = self::footerNote();
+        return 'Начин на плащане избирате при заявката. Подробности: ' . self::methodsPageUrl();
+    }
 
-        return $bankBlock . implode("\n", $lines);
+    public static function methodsPageUrl(): string
+    {
+        $cfg = require BASE_PATH . '/config/app.php';
+
+        return rtrim((string) ($cfg['url'] ?? ''), '/') . '/payment-methods';
     }
 
     /** @param list<array<string, mixed>> $list */
@@ -114,21 +95,28 @@ final class PaymentMethodsService
         $methods = [];
         foreach (preg_split('/\r\n|\n|\r/', $lines) as $line) {
             $line = trim($line);
-            if ($line === '') {
+            if ($line === '' || self::isNoteLine($line)) {
                 continue;
             }
-            $automatic = true;
-            if (preg_match('/банков|превод/i', $line)) {
-                $automatic = false;
+            $automatic = !preg_match('/банков|превод/i', $line);
+            $name = trim(preg_replace('/\s*[\-—].*$/u', '', $line));
+            if ($name === '' || mb_strlen($name) > 60) {
+                continue;
             }
             $methods[] = [
-                'name' => preg_replace('/\s*[\-—].*$/u', '', $line),
+                'name' => $name,
                 'automatic' => $automatic,
-                'note' => $automatic ? 'Автоматично отчитане' : 'Ръчна обработка',
+                'note' => '',
             ];
         }
 
         return self::sanitizeList($methods);
+    }
+
+    public static function isNoteLine(string $line): bool
+    {
+        return (bool) preg_match('/всички плащания|получава заявен|автоматично отчитане|ручно одобрение/i', $line)
+            || str_contains($line, 'стават:');
     }
 
     public static function methodsToText(array $methods): string

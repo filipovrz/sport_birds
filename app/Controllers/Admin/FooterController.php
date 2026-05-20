@@ -9,7 +9,6 @@ use App\Core\Session;
 use App\Services\AdminPermissionService;
 use App\Services\FooterService;
 use App\Services\LegalContentService;
-use App\Services\PaymentMethodsService;
 
 final class FooterController extends Controller
 {
@@ -22,12 +21,9 @@ final class FooterController extends Controller
         }
         $footer = FooterService::config();
         $legal = LegalContentService::allPages();
-        $methods = PaymentMethodsService::forFooter();
         $this->view('admin.footer', [
             'footer' => $footer,
             'legal' => $legal,
-            'paymentMethodsLines' => PaymentMethodsService::methodsToText($methods),
-            'paymentFooterNote' => PaymentMethodsService::footerNoteStored(),
         ], 'layouts.admin');
     }
 

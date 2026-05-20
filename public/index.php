@@ -31,6 +31,7 @@ $router->post('/install', 'InstallController@run', array_merge($mw, [InstallLock
 $router->get('/', 'HomeController@index', $mw);
 $router->get('/dev', 'HomeController@testHub', $mw);
 $router->get('/pricing', 'HomeController@pricing', array_merge($mw, $installed));
+$router->get('/payment-methods', 'PaymentMethodsController@index', array_merge($mw, $installed));
 $router->get('/legal/{slug}', 'LegalController@show', array_merge($mw, $installed));
 $router->get('/pedigree/public/{id}', 'PublicPedigreeController@show', $mw);
 $router->get('/announcements', 'AnnouncementController@index', array_merge($mw, $installed));
