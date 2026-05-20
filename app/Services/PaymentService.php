@@ -107,6 +107,51 @@ final class PaymentService
         return 'BSB-' . str_pad((string) $payment['id'], 8, '0', STR_PAD_LEFT);
     }
 
+    /** @return array<string, mixed>|null */
+    public static function findByPayable(string $type, int $payableId): ?array
+    {
+        return Database::fetch(
+            'SELECT * FROM payments WHERE payable_type = ? AND payable_id = ? ORDER BY id DESC LIMIT 1',
+            [$type, $payableId]
+        );
+    }
+
+    public static function updateMethod(int $paymentId, string $methodSlug): void
+    {
+        Database::update('payments', [
+            'method' => $methodSlug,
+            'gateway' => $methodSlug,
+            'status' => 'created',
+            'gateway_session_id' => null,
+            'gateway_payment_id' => null,
+        ], 'id = ?', [$paymentId]);
+    }
+
+    /** Обработка на return URL след плащане при доставчик. */
+    public static function processReturn(array $payment, array $query, array $post = []): bool
+    {
+        $gatewaySlug = PaymentGatewayRegistry::resolveMethodSlug(
+            (string) ($query['gateway'] ?? $payment['method'] ?? '')
+        );
+        $gw = PaymentGatewayRegistry::get($gatewaySlug);
+        if ($gw === null) {
+            return false;
+        }
+        $merged = array_merge($query, $post);
+        $gid = $gw->verifyReturn($payment, $merged);
+        if ($gid === null && $gatewaySlug === 'stripe') {
+            $sessionId = trim((string) ($payment['gateway_session_id'] ?? ''));
+            if ($sessionId !== '') {
+                $gid = $gw->verifyReturn($payment, ['session_id' => $sessionId]);
+            }
+        }
+        if ($gid === null) {
+            return false;
+        }
+
+        return self::handleGatewaySuccess((string) $payment['public_token'], $gid, $gatewaySlug);
+    }
+
     public static function handleGatewaySuccess(string $token, ?string $gatewayPaymentId, ?string $gateway = null): bool
     {
         $payment = self::findByToken($token);

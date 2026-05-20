@@ -29,9 +29,11 @@ final class StripeGateway implements PaymentGatewayInterface
         if ($amountCents < 50) {
             $amountCents = 50;
         }
+        $successUrl = $returnUrl . (str_contains($returnUrl, '?') ? '&' : '?')
+            . 'gateway=stripe&session_id={CHECKOUT_SESSION_ID}';
         $params = http_build_query([
             'mode' => 'payment',
-            'success_url' => $returnUrl . (str_contains($returnUrl, '?') ? '&' : '?') . 'gateway=stripe',
+            'success_url' => $successUrl,
             'cancel_url' => $cancelUrl,
             'client_reference_id' => $payment['public_token'],
             'line_items[0][price_data][currency]' => 'eur',
@@ -48,7 +50,7 @@ final class StripeGateway implements PaymentGatewayInterface
             ['Authorization: Bearer ' . $secret]
         );
         if ($res['code'] < 200 || $res['code'] >= 300) {
-            throw new \RuntimeException('Stripe: неуспешно създаване на сесия.');
+            throw new \RuntimeException('Stripe: ' . self::apiError($res['body']));
         }
         $data = json_decode($res['body'], true);
         if (empty($data['url'])) {
@@ -63,7 +65,7 @@ final class StripeGateway implements PaymentGatewayInterface
 
     public function verifyReturn(array $payment, array $query): ?string
     {
-        $sessionId = trim((string) ($query['session_id'] ?? ''));
+        $sessionId = trim((string) ($query['session_id'] ?? $payment['gateway_session_id'] ?? ''));
         if ($sessionId === '') {
             return null;
         }
@@ -78,6 +80,13 @@ final class StripeGateway implements PaymentGatewayInterface
         }
 
         return null;
+    }
+
+    private static function apiError(string $body): string
+    {
+        $data = json_decode($body, true);
+
+        return (string) ($data['error']['message'] ?? 'неуспешно API извикване');
     }
 
     public function verifyWebhook(string $rawBody, array $headers): ?array

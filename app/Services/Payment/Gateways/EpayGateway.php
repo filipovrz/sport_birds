@@ -47,7 +47,7 @@ final class EpayGateway implements PaymentGatewayInterface
             . '<input type="hidden" name="PAGE" value="paylogin">'
             . '<input type="hidden" name="ENCODED" value="' . htmlspecialchars($encoded) . '">'
             . '<input type="hidden" name="CHECKSUM" value="' . htmlspecialchars($checksum) . '">'
-            . '<input type="hidden" name="URL_OK" value="' . htmlspecialchars($returnUrl) . '">'
+            . '<input type="hidden" name="URL_OK" value="' . htmlspecialchars($returnUrl . (str_contains($returnUrl, '?') ? '&' : '?') . 'gateway=epay') . '">'
             . '<input type="hidden" name="URL_CANCEL" value="' . htmlspecialchars($cancelUrl) . '">'
             . '</form><script>document.getElementById("epay").submit();</script></body></html>';
 
@@ -56,6 +56,12 @@ final class EpayGateway implements PaymentGatewayInterface
 
     public function verifyReturn(array $payment, array $query): ?string
     {
+        if (!empty($query['ENCODED']) && !empty($query['CHECKSUM'])) {
+            $parsed = $this->verifyWebhook(http_build_query($query), []);
+            if ($parsed !== null) {
+                return (string) ($parsed['gateway_payment_id'] ?? $payment['id']);
+            }
+        }
         $status = strtoupper(trim((string) ($query['STATUS'] ?? $query['status'] ?? '')));
         if (in_array($status, ['PAID', 'OK', '00'], true)) {
             return (string) ($query['INVOICE'] ?? $payment['id']);

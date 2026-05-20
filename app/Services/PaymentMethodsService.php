@@ -87,10 +87,15 @@ final class PaymentMethodsService
         return rtrim((string) ($cfg['url'] ?? ''), '/') . '/payment-methods';
     }
 
+    public static function checkoutUrl(string $slug): string
+    {
+        return '/payment/checkout/' . rawurlencode($slug);
+    }
+
     public static function continueUrl(string $slug): string
     {
         if (\App\Core\Auth::check()) {
-            return '/dashboard/subscription?payment_method=' . rawurlencode($slug);
+            return self::checkoutUrl($slug);
         }
 
         return '/login?redirect=' . rawurlencode(self::methodUrl($slug));

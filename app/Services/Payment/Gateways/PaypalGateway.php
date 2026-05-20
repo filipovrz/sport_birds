@@ -53,7 +53,8 @@ final class PaypalGateway implements PaymentGatewayInterface
             }
         }
         if ($approve === null) {
-            throw new \RuntimeException('PayPal: липсва линк за плащане.');
+            $msg = $data['message'] ?? $data['error_description'] ?? 'липсва линк за плащане';
+            throw new \RuntimeException('PayPal: ' . $msg);
         }
 
         return [
@@ -89,14 +90,17 @@ final class PaypalGateway implements PaymentGatewayInterface
     public function verifyWebhook(string $rawBody, array $headers): ?array
     {
         $event = json_decode($rawBody, true);
-        if (($event['event_type'] ?? '') !== 'CHECKOUT.ORDER.APPROVED'
-            && ($event['event_type'] ?? '') !== 'PAYMENT.CAPTURE.COMPLETED') {
+        $type = $event['event_type'] ?? '';
+        if (!in_array($type, ['CHECKOUT.ORDER.APPROVED', 'PAYMENT.CAPTURE.COMPLETED'], true)) {
             return null;
         }
         $resource = $event['resource'] ?? [];
         $ref = $resource['purchase_units'][0]['reference_id']
             ?? $resource['custom_id']
-            ?? '';
+            ?? ($resource['supplementary_data']['related_ids']['order_id'] ?? '');
+        if ($type === 'PAYMENT.CAPTURE.COMPLETED' && isset($event['resource']['custom_id'])) {
+            $ref = $event['resource']['custom_id'];
+        }
 
         return [
             'gateway_payment_id' => $resource['id'] ?? '',

@@ -28,32 +28,33 @@ final class RevolutGateway implements PaymentGatewayInterface
         $secret = (string) PaymentConfig::gateway('revolut')['api_secret'];
         $api = $this->apiBase();
         $amountMinor = (int) round((float) $payment['amount_eur'] * 100);
-        $res = HttpClient::postJson($api . '/api/orders', [
+        $returnWithGateway = $returnUrl . (str_contains($returnUrl, '?') ? '&' : '?') . 'gateway=revolut';
+        $res = HttpClient::postJson($api . '/api/1.0/orders', [
             'amount' => $amountMinor,
             'currency' => 'EUR',
             'description' => $payment['description'] ?? 'Best Sport Byrds',
             'merchant_order_ext_ref' => $payment['public_token'],
-            'redirect_url' => $returnUrl,
+            'redirect_url' => $returnWithGateway,
         ], [
             'Authorization: Bearer ' . $secret,
             'Revolut-Api-Version: 2023-09-01',
         ]);
         $data = json_decode($res['body'], true);
-        $url = $data['checkout_url'] ?? $data['public_id'] ?? null;
-        if ($url === null && !empty($data['id'])) {
-            $url = $returnUrl . (str_contains($returnUrl, '?') ? '&' : '?')
-                . 'gateway=revolut&order_id=' . rawurlencode((string) $data['id']);
+        if ($res['code'] < 200 || $res['code'] >= 300) {
+            throw new \RuntimeException('Revolut: ' . ($data['message'] ?? $res['body']));
+        }
+        $url = $data['checkout_url'] ?? null;
+        $orderId = $data['id'] ?? null;
+        if ($url === null && $orderId !== null) {
+            $url = $returnWithGateway . '&order_id=' . rawurlencode((string) $orderId);
         }
         if ($url === null) {
             throw new \RuntimeException('Revolut: неуспешно създаване на поръчка.');
         }
-        if (!str_starts_with((string) $url, 'http')) {
-            $url = 'https://checkout.revolut.com/payment-link/' . $url;
-        }
 
         return [
             'redirect_url' => $url,
-            'session_id' => $data['id'] ?? null,
+            'session_id' => $orderId,
         ];
     }
 
@@ -65,7 +66,7 @@ final class RevolutGateway implements PaymentGatewayInterface
         }
         $secret = (string) PaymentConfig::gateway('revolut')['api_secret'];
         $res = HttpClient::get(
-            $this->apiBase() . '/api/orders/' . rawurlencode($orderId),
+            $this->apiBase() . '/api/1.0/orders/' . rawurlencode($orderId),
             [
                 'Authorization: Bearer ' . $secret,
                 'Revolut-Api-Version: 2023-09-01',

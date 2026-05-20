@@ -7,7 +7,6 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Database;
 use App\Core\Session;
-use App\Services\Payment\PaymentGatewayRegistry;
 use App\Services\PaymentService;
 use App\Services\SettingsService;
 
@@ -59,16 +58,7 @@ final class PaymentController extends Controller
             $this->redirect('/dashboard');
         }
         PaymentService::assertOwner($payment);
-        $gatewaySlug = PaymentGatewayRegistry::resolveMethodSlug(
-            (string) ($_GET['gateway'] ?? $payment['method'] ?? '')
-        );
-        $gw = PaymentGatewayRegistry::get($gatewaySlug);
-        if ($gw !== null) {
-            $gid = $gw->verifyReturn($payment, $_GET);
-            if ($gid !== null) {
-                PaymentService::handleGatewaySuccess($token, $gid, $gatewaySlug);
-            }
-        }
+        PaymentService::processReturn($payment, $_GET, $_POST);
         $fresh = PaymentService::findByToken($token);
         if ($fresh && ($fresh['status'] ?? '') === 'paid') {
             Session::flash('success', 'Плащането е успешно. Заявената услуга е активирана.');

@@ -61,10 +61,13 @@ $router->post('/webhooks/epay', 'WebhookController@epay', $mw);
 $router->post('/webhooks/paypal', 'WebhookController@paypal', $mw);
 $router->post('/webhooks/revolut', 'WebhookController@revolut', $mw);
 
-$router->group(['middleware' => array_merge($mw, $installed, [AuthMiddleware::class])], function (Router $r) {
+$router->group(['middleware' => array_merge($mw, $installed, [AuthMiddleware::class])], function (Router $r) use ($csrf) {
+    $r->get('/payment/checkout/{slug}', 'PaymentMethodsController@checkout');
+    $r->post('/payment/checkout/{slug}', 'PaymentMethodsController@checkout', $csrf);
     $r->get('/payment/bank/{token}', 'PaymentController@bank');
     $r->get('/payment/status/{token}', 'PaymentController@status');
     $r->get('/payment/return/{token}', 'PaymentController@return');
+    $r->post('/payment/return/{token}', 'PaymentController@return');
     $r->get('/payment/cancel/{token}', 'PaymentController@cancel');
     $r->get('/payment/go/{token}', 'PaymentController@redirectForm');
 });

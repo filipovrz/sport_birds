@@ -55,6 +55,33 @@ final class PaymentConfig
         return round($eur * self::all()['eur_bgn_rate'], 2);
     }
 
+    /** @return list<string> */
+    public static function missingFields(string $slug): array
+    {
+        $g = self::gateway($slug);
+        return match ($slug) {
+            'stripe' => self::missing(['secret_key' => 'STRIPE_SECRET_KEY'], $g),
+            'epay' => self::missing(['min' => 'EPAY_MIN', 'secret' => 'EPAY_SECRET'], $g),
+            'paypal' => self::missing(['client_id' => 'PAYPAL_CLIENT_ID', 'secret' => 'PAYPAL_SECRET'], $g),
+            'revolut' => self::missing(['api_secret' => 'REVOLUT_API_SECRET'], $g),
+            'bank' => [],
+            default => ['неизвестен метод'],
+        };
+    }
+
+    /** @param array<string, string> $map */
+    private static function missing(array $map, array $cfg): array
+    {
+        $out = [];
+        foreach ($map as $field => $label) {
+            if (trim((string) ($cfg[$field] ?? '')) === '') {
+                $out[] = $label;
+            }
+        }
+
+        return $out;
+    }
+
     private static function boolSetting(string $key, bool $default): bool
     {
         $v = SettingsService::get($key, '');

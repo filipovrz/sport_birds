@@ -31,12 +31,17 @@ final class CheckoutFlowService
             $slug,
             $description
         );
-        if ($slug === 'bank') {
-            header('Location: /payment/bank/' . $payment['public_token']);
+        try {
+            PaymentCheckoutService::start($slug, [
+                'payable_type' => $payableType,
+                'payable_id' => $payableId,
+                'payment_token' => $payment['public_token'],
+            ]);
+        } catch (\Throwable $e) {
+            Session::flash('error', $e->getMessage());
+            header('Location: /payment/status/' . $payment['public_token']);
             exit;
         }
-        header('Location: /payment/go/' . $payment['public_token']);
-        exit;
     }
 
     public static function paymentMethodFromPost(): string
