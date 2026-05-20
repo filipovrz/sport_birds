@@ -59,7 +59,7 @@
 ### Ключови файлове
 - `database/phase4_payments.sql`, `phase4_1_footer_cleanup.sql`
 - `app/Services/PaymentService.php`, `PaymentFulfillmentService.php`, `Payment/Gateways/*`
-- `docs/PAYMENTS.md`, `.env.example`
+- `docs/PAYMENTS.md` (настройка в системата), `docs/PAYMENT_PROVIDERS_CHECKLIST.md` (какво да вземете от доставчиците), `.env.example`
 
 ### Маршрути
 - `/payment/bank|go|return|cancel|status/{token}`
