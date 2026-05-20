@@ -38,6 +38,6 @@ final class SettingsService
 
     public static function paymentInstructions(): string
     {
-        return self::get('payment_instructions', '') ?? '';
+        return PaymentMethodsService::instructionsForForms();
     }
 }

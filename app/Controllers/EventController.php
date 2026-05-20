@@ -86,6 +86,7 @@ final class EventController extends Controller
         $this->view('events.form', [
             'publishFee' => $fee,
             'paymentInstructions' => SettingsService::paymentInstructions(),
+            'paymentMethods' => \App\Services\CheckoutFlowService::methodsForForms(),
             'requiresPayment' => !Auth::isAdmin() && $fee > 0,
         ]);
     }
@@ -99,8 +100,8 @@ final class EventController extends Controller
         $fee = Auth::isAdmin() ? 0.0 : SettingsService::eventPublishFeeEur();
         $requiresPayment = $fee > 0;
 
-        if ($requiresPayment && trim($_POST['payment_reference'] ?? '') === '') {
-            Session::flash('error', 'Посочете референция на плащането за публикуване на обявата.');
+        if ($requiresPayment && trim($_POST['payment_method'] ?? '') === '') {
+            Session::flash('error', 'Изберете начин на плащане.');
             Session::flash('old', $_POST);
             $this->redirect('/dashboard/events/create');
         }
@@ -110,7 +111,6 @@ final class EventController extends Controller
             $data['status'] = 'draft';
             $data['payment_status'] = 'pending';
             $data['publish_fee_eur'] = $fee;
-            $data['payment_reference'] = trim($_POST['payment_reference'] ?? '');
             $data['is_featured'] = 0;
         } else {
             $data['status'] = 'published';
@@ -124,8 +124,13 @@ final class EventController extends Controller
 
         $id = Database::insert('event_announcements', $data);
         if ($requiresPayment) {
-            Session::flash('success', 'Обявата е изпратена. Ще бъде публикувана след потвърждение на плащането.');
-            $this->redirect('/dashboard/events/my');
+            \App\Services\CheckoutFlowService::start(
+                \App\Services\PaymentService::PAYABLE_EVENT,
+                $id,
+                $fee,
+                'Публикуване събитие: ' . ($data['title'] ?? ''),
+                \App\Services\CheckoutFlowService::paymentMethodFromPost()
+            );
         }
         Session::flash('success', 'Обявата за събитие е публикувана.');
         $this->redirect('/events/' . $id);

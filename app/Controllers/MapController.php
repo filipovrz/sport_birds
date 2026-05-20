@@ -75,6 +75,33 @@ final class MapController extends Controller
             ];
         }
 
+        $events = Database::fetchAll(
+            "SELECT id, title, latitude, longitude, event_date, location
+             FROM events
+             WHERE status = 'published'
+             AND event_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+             ORDER BY event_date ASC
+             LIMIT 50"
+        );
+        foreach ($events as $e) {
+            $coords = GeocodingService::resolve(
+                $e['location'] ?? null,
+                $e['latitude'] ?? null,
+                $e['longitude'] ?? null
+            );
+            if (!$coords) {
+                continue;
+            }
+            $markers[] = [
+                'type' => 'event',
+                'lat' => $coords['lat'],
+                'lng' => $coords['lng'],
+                'title' => $e['title'],
+                'desc' => $e['event_date'] . ' — ' . ($e['location'] ?? 'Събитие'),
+                'url' => '/events/' . $e['id'],
+            ];
+        }
+
         $this->view('map.index', ['markers' => $markers]);
     }
 }

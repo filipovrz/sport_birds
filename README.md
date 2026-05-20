@@ -105,7 +105,7 @@ CHECKPOINT.md  — прогрес при разработка
 
 ## Версии
 
-Текуща: **2.1.6** (фаза 3). История: `VERSION.md`, прогрес: `CHECKPOINT.md`.
+Текуща: **2.2.0** (фаза 3 завършена). История: `VERSION.md`, прогрес: `CHECKPOINT.md`.
 
 ### GPS API (устройства)
 
@@ -115,6 +115,20 @@ Content-Type: application/json
 
 {"token":"API_ТОКЕН_ОТ_ПАНЕЛА","latitude":42.6977,"longitude":23.3219,"speed_kmh":50,"battery":90}
 ```
+
+### CSV експорт (платен план с analytics)
+
+- `/dashboard/export/birds.csv`
+- `/dashboard/export/lofts.csv`
+- `/dashboard/export/competitions.csv`
+
+### Cron — здравни напомняния
+
+```bash
+php scripts/cron-health-reminders.php 14
+```
+
+Админ панелът също може ръчно да изпрати напомняния.
 
 ## Продължаване на разработката
 

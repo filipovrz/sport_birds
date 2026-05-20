@@ -2,7 +2,7 @@
 <?php if (!empty($requiresPayment)): ?>
 <div class="alert" style="background:#eef4f9;border:1px solid var(--primary)">
     <p><strong>Такса за публикуване:</strong> <?= format_eur($publishFee) ?></p>
-    <p style="margin:0.5rem 0 0;font-size:0.95rem">След изпращане обявата ще бъде прегледана от администратор след потвърждение на плащането.</p>
+    <p style="margin:0.5rem 0 0;font-size:0.95rem">Онлайн плащанията активират обявата автоматично. При банков превод — след потвърждение от администратор.</p>
 </div>
 <?php elseif (\App\Core\Auth::isAdmin()): ?>
 <p style="color:var(--muted)">Като администратор публикувате без такса.</p>
@@ -25,19 +25,17 @@
     <div class="form-group"><label>Клуб / организатор</label><input name="club_name"></div>
     <div class="form-group"><label>Такса за участие в състезанието (€)</label><input name="entry_fee_bgn" type="number" step="0.01"><small style="color:var(--muted)"> По желание — за участниците в гонката</small></div>
     <?php if (!empty($requiresPayment)): ?>
-    <div class="form-group"><label>Референция на плащане за обявата *</label>
-        <input name="payment_reference" required placeholder="Напр. номер на превод">
-    </div>
+    <?php require BASE_PATH . '/resources/views/payment/_methods.php'; ?>
     <?php if (!empty($paymentInstructions)): ?>
     <div class="card" style="background:#f8f9fa;margin-bottom:1rem">
-        <h3 style="margin-top:0;font-size:1rem">Инструкции за плащане</h3>
+        <h3 style="margin-top:0;font-size:1rem">Банкови реквизити</h3>
         <p style="margin:0"><?= nl2br(htmlspecialchars($paymentInstructions)) ?></p>
     </div>
     <?php endif; ?>
     <?php elseif (\App\Core\Auth::isAdmin()): ?>
     <label><input type="checkbox" name="is_featured"> Препоръчана обява</label>
     <?php endif; ?>
-    <p style="margin-top:1rem"><button class="btn btn-primary"><?= !empty($requiresPayment) ? 'Изпрати за одобрение' : 'Публикувай' ?></button></p>
+    <p style="margin-top:1rem"><button class="btn btn-primary"><?= !empty($requiresPayment) ? 'Продължи към плащане' : 'Публикувай' ?></button></p>
 </form>
 </div>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">

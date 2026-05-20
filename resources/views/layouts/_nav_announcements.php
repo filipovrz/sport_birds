@@ -1,7 +1,11 @@
 <?php
+use App\Services\AdminPermissionService;
+
 /** @var string $variant sidebar|header|admin */
 $variant = $variant ?? 'sidebar';
 $loggedIn = \App\Core\Auth::check();
+$canAnn = AdminPermissionService::can('announcements');
+$canEv = AdminPermissionService::can('events');
 ?>
 <?php if ($variant === 'header'): ?>
 <div class="nav-dropdown">
@@ -15,11 +19,6 @@ $loggedIn = \App\Core\Auth::check();
     </div>
 </div>
 <?php elseif ($variant === 'admin'): ?>
-<?php
-use App\Services\AdminPermissionService;
-$canAnn = AdminPermissionService::can('announcements');
-$canEv = AdminPermissionService::can('events');
-?>
 <?php if ($canAnn || $canEv): ?>
 <details class="nav-group">
     <summary>Обяви</summary>

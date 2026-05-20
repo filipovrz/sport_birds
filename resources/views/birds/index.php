@@ -1,7 +1,12 @@
-<div style="display:flex;justify-content:space-between;align-items:center">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem">
     <h1>Птици</h1>
-    <a href="/dashboard/birds/create" class="btn btn-primary">+ Добави</a>
-</div>
+    <div>
+        <?php if (\App\Services\ExportService::canExport()): ?>
+        <a href="/dashboard/export/birds.csv" class="btn btn-outline btn-sm">CSV</a>
+        <?php endif; ?>
+        <a href="/dashboard/birds/create" class="btn btn-primary">+ Добави</a>
+    </div>
+    </div>
 <div class="card">
 <table>
 <tr><th>Пръстен</th><th>Име</th><th>Вид</th><th>Гълъбарник</th><th>Статус</th><th></th></tr>

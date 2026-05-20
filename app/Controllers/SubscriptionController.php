@@ -8,13 +8,15 @@ use App\Core\Auth;
 use App\Core\Controller;
 use App\Core\Database;
 use App\Core\Session;
+use App\Services\CheckoutFlowService;
+use App\Services\PaymentService;
 use App\Services\SubscriptionService;
 
 final class SubscriptionController extends Controller
 {
     public function index(): void
     {
-        $settings = Database::fetch("SELECT `value` FROM settings WHERE `key` = 'payment_instructions'");
+        $paymentInstructions = \App\Services\SettingsService::paymentInstructions();
         $user = Auth::user();
         $pending = Database::fetch(
             'SELECT sr.*, p.name AS plan_name FROM subscription_requests sr
@@ -27,7 +29,8 @@ final class SubscriptionController extends Controller
             'current' => SubscriptionService::currentPlan($user),
             'isPremium' => Auth::hasPremium(),
             'activePlanPrice' => SubscriptionService::activePaidPlanPrice($user),
-            'paymentInstructions' => $settings['value'] ?? '',
+            'paymentInstructions' => $paymentInstructions,
+            'paymentMethods' => CheckoutFlowService::methodsForForms(),
             'pending' => $pending,
             'pendingPlanName' => $pending['plan_name'] ?? null,
         ]);
@@ -47,13 +50,22 @@ final class SubscriptionController extends Controller
             Session::flash('error', $block);
             $this->redirect('/dashboard/subscription');
         }
-        Database::insert('subscription_requests', [
+        $requestId = Database::insert('subscription_requests', [
             'user_id' => Auth::id(),
             'plan_id' => $planId,
-            'payment_reference' => trim($_POST['payment_reference'] ?? '') ?: null,
             'notes' => trim($_POST['notes'] ?? '') ?: null,
         ]);
-        Session::flash('success', 'Заявката е изпратена. Администраторът ще я активира след потвърждение на плащането.');
-        $this->redirect('/dashboard/subscription');
+        $amount = (float) $plan['price_eur'];
+        if ($amount <= 0) {
+            Session::flash('success', 'Заявката е изпратена.');
+            $this->redirect('/dashboard/subscription');
+        }
+        CheckoutFlowService::start(
+            PaymentService::PAYABLE_SUBSCRIPTION,
+            $requestId,
+            $amount,
+            'Абонамент: ' . ($plan['name'] ?? ''),
+            CheckoutFlowService::paymentMethodFromPost()
+        );
     }
 }

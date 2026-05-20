@@ -35,7 +35,7 @@
     <div class="form-group"><label>Клуб / организатор</label><input name="club_name"></div>
     <div class="form-group"><label>Такса за участие в събитието (€)</label><input name="attendance_fee_eur" type="number" step="0.01"><small style="color:var(--muted)"> По желание — за гостите, не за публикуване</small></div>
     <?php if (!empty($requiresPayment)): ?>
-    <div class="form-group"><label>Референция на плащане *</label><input name="payment_reference" required></div>
+    <?php require BASE_PATH . '/resources/views/payment/_methods.php'; ?>
     <?php if (!empty($paymentInstructions)): ?>
     <div class="card" style="background:#f8f9fa;margin-bottom:1rem"><p style="margin:0"><?= nl2br(htmlspecialchars($paymentInstructions)) ?></p></div>
     <?php endif; ?>

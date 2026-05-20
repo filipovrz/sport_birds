@@ -213,6 +213,7 @@ final class HomeController extends Controller
                     ['label' => 'Настройки сайт', 'url' => '/admin/settings', 'note' => '', 'auth' => true],
                     ['label' => 'Футър и политики', 'url' => '/admin/footer', 'note' => 'право settings', 'auth' => true],
                     ['label' => 'Поверителност', 'url' => '/legal/privacy', 'note' => 'публично', 'auth' => false],
+                    ['label' => 'GDPR', 'url' => '/legal/gdpr', 'note' => 'публично', 'auth' => false],
                     ['label' => 'Условия', 'url' => '/legal/terms', 'note' => 'публично', 'auth' => false],
                     ['label' => 'Бисквитки', 'url' => '/legal/cookies', 'note' => 'публично', 'auth' => false],
                     ['label' => 'Плащания за обяви', 'url' => '/admin/announcement-payments', 'note' => '', 'auth' => true],

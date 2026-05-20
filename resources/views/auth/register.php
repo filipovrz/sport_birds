@@ -24,7 +24,7 @@
         <div class="form-group" style="margin-top:1rem">
             <label style="display:flex;align-items:flex-start;gap:0.5rem;font-weight:normal">
                 <input type="checkbox" name="accept_terms" value="1" required style="margin-top:0.2rem">
-                <span>Прочетох и приемам <a href="/legal/terms" target="_blank" rel="noopener">общите условия</a> и <a href="/legal/privacy" target="_blank" rel="noopener">политиката за поверителност</a>.</span>
+                <span>Прочетох и приемам <a href="/legal/terms" target="_blank" rel="noopener">общите условия</a>, <a href="/legal/privacy" target="_blank" rel="noopener">политиката за поверителност</a> и <a href="/legal/gdpr" target="_blank" rel="noopener">информацията по GDPR</a>.</span>
             </label>
         </div>
         <div class="form-group">

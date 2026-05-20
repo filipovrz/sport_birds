@@ -91,6 +91,7 @@ final class AnnouncementController extends Controller
             'item' => null,
             'publishFee' => $fee,
             'paymentInstructions' => SettingsService::paymentInstructions(),
+            'paymentMethods' => \App\Services\CheckoutFlowService::methodsForForms(),
             'requiresPayment' => !Auth::isAdmin() && $fee > 0,
         ]);
     }
@@ -104,8 +105,8 @@ final class AnnouncementController extends Controller
         $fee = Auth::isAdmin() ? 0.0 : SettingsService::announcementPublishFeeEur();
         $requiresPayment = $fee > 0;
 
-        if ($requiresPayment && trim($_POST['payment_reference'] ?? '') === '') {
-            Session::flash('error', 'Посочете референция на плащането за публикуване на обявата.');
+        if ($requiresPayment && trim($_POST['payment_method'] ?? '') === '') {
+            Session::flash('error', 'Изберете начин на плащане.');
             Session::flash('old', $_POST);
             $this->redirect('/dashboard/announcements/create');
         }
@@ -115,7 +116,6 @@ final class AnnouncementController extends Controller
             $data['status'] = 'draft';
             $data['payment_status'] = 'pending';
             $data['publish_fee_eur'] = $fee;
-            $data['payment_reference'] = trim($_POST['payment_reference'] ?? '');
             $data['is_featured'] = 0;
         } else {
             $data['status'] = 'published';
@@ -129,8 +129,13 @@ final class AnnouncementController extends Controller
 
         $id = Database::insert('competition_announcements', $data);
         if ($requiresPayment) {
-            Session::flash('success', 'Обявата е изпратена. Ще бъде публикувана след потвърждение на плащането от администратор.');
-            $this->redirect('/dashboard/announcements/my');
+            \App\Services\CheckoutFlowService::start(
+                \App\Services\PaymentService::PAYABLE_COMPETITION,
+                $id,
+                $fee,
+                'Публикуване обява: ' . ($data['title'] ?? ''),
+                \App\Services\CheckoutFlowService::paymentMethodFromPost()
+            );
         }
         Session::flash('success', 'Обявата е публикувана.');
         $this->redirect('/announcements/' . $id);

@@ -25,6 +25,10 @@ final class GpsDeviceController extends Controller
 
     public function create(): void
     {
+        if (!SubscriptionService::hasFeature('gps_tracking')) {
+            Session::flash('error', 'GPS проследяването изисква платен план.');
+            $this->redirect('/dashboard/subscription');
+        }
         $this->view('gps.form', [
             'device' => null,
             'birds' => Bird::forUser(Auth::id()),
@@ -33,6 +37,10 @@ final class GpsDeviceController extends Controller
 
     public function store(): void
     {
+        if (!SubscriptionService::hasFeature('gps_tracking')) {
+            Session::flash('error', 'GPS проследяването изисква платен план.');
+            $this->redirect('/dashboard/subscription');
+        }
         $d = $this->validate(['name' => 'required', 'serial_number' => 'required']);
         try {
             GpsDevice::create([

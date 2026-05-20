@@ -1,4 +1,4 @@
-<h1>Футър и правни страници</h1>
+﻿<h1>Футър и правни страници</h1>
 <p style="color:var(--muted)">Съдържанието се показва на всички публични страници и в таблото.</p>
 <div class="card">
 <form method="post" action="/admin/footer">
@@ -18,16 +18,33 @@
         <input type="email" name="footer_email" value="<?= htmlspecialchars($footer['email'] ?? '') ?>">
         <small style="color:var(--muted)">Основният контактен имейл е в „Настройки“.</small>
     </div>
-    <div class="form-group"><label>Текст за авторски права (празно = автоматично)</label>
-        <input name="footer_copyright" value="<?= htmlspecialchars($footer['copyright'] ?? '') ?>"></div>
+    <div class="form-group"><label>Текст за авторски права</label>
+        <input name="footer_copyright" value="<?= htmlspecialchars($footer['copyright'] ?? 'Evtinko © ' . date('Y') . ' Best Sport Byrds') ?>"></div>
+    <hr style="margin:1.5rem 0;border:none;border-top:1px solid var(--border)">
+    <h2 style="margin-top:0;font-size:1.1rem">Информация за администратора</h2>
+    <?php $co = $footer['company'] ?? []; ?>
+    <div class="grid grid-2">
+        <div class="form-group"><label>Фирма</label><input name="company_firm_name" value="<?= htmlspecialchars($co['firm_name'] ?? '') ?>"></div>
+        <div class="form-group"><label>ЕИК</label><input name="company_eik" value="<?= htmlspecialchars($co['eik'] ?? '') ?>"></div>
+        <div class="form-group"><label>ДДС №</label><input name="company_vat" value="<?= htmlspecialchars($co['vat'] ?? '') ?>"></div>
+        <div class="form-group"><label>Телефон</label><input name="company_phone" value="<?= htmlspecialchars($co['phone'] ?? '') ?>"></div>
+        <div class="form-group"><label>Имейл</label><input type="email" name="company_email" value="<?= htmlspecialchars($co['email'] ?? '') ?>"></div>
+        <div class="form-group"><label>Уебсайт</label><input name="company_website" value="<?= htmlspecialchars($co['website'] ?? '') ?>"></div>
+    </div>
+    <div class="form-group"><label>Адрес</label><textarea name="company_address" rows="2"><?= htmlspecialchars($co['address'] ?? '') ?></textarea></div>
+    <div class="form-group"><label>Друго</label><textarea name="company_other" rows="2"><?= htmlspecialchars($co['other'] ?? '') ?></textarea></div>
+    <input type="hidden" name="company_title" value="<?= htmlspecialchars($co['title'] ?? 'Информация') ?>">
     <hr style="margin:1.5rem 0;border:none;border-top:1px solid var(--border)">
     <h2 style="margin-top:0;font-size:1.1rem">Начини на плащане</h2>
-    <div class="form-group"><label>Заглавие</label><input name="footer_payment_title" value="<?= htmlspecialchars($footer['payment_title'] ?? 'Начини на плащане') ?>"></div>
-    <div class="form-group"><label>Описание (един ред = един начин)</label>
-        <textarea name="footer_payment_text" rows="4"><?= htmlspecialchars($footer['payment_text'] ?? '') ?></textarea></div>
+    <p style="color:var(--muted);font-size:0.9rem">По един метод на ред. Банковите реквизити (IBAN и др.) — в <a href="/admin/settings">Настройки</a>.</p>
+    <div class="form-group"><label>Заглавие във футъра</label><input name="footer_payment_title" value="<?= htmlspecialchars($footer['payment_title'] ?? 'Начини на плащане') ?>"></div>
+    <div class="form-group"><label>Методи (по един на ред)</label>
+        <textarea name="payment_methods_lines" rows="5" placeholder="Банков превод&#10;Кредитна/дебитна карта&#10;ePay.bg"><?= htmlspecialchars($paymentMethodsLines ?? '') ?></textarea></div>
+    <div class="form-group"><label>Бележка под списъка</label>
+        <textarea name="payment_footer_note" rows="2"><?= htmlspecialchars($paymentFooterNote ?? '') ?></textarea></div>
     <hr style="margin:1.5rem 0;border:none;border-top:1px solid var(--border)">
     <h2 style="margin-top:0;font-size:1.1rem">Колони с връзки</h2>
-    <p style="color:var(--muted);font-size:0.9rem">На всеки ред: <code>Етикет | /път</code> (напр. <code>Цени | /pricing</code>)</p>
+    <p style="color:var(--muted);font-size:0.9rem">На всеки ред: <code>Етикет | /път</code> (напр. правни страници). Колона „Информация“ се попълва от секцията по-горе.</p>
     <?php
     $cols = $footer['columns'] ?? [];
     for ($i = 1; $i <= 4; $i++):
@@ -42,8 +59,9 @@
     <?php endfor; ?>
     <hr style="margin:1.5rem 0;border:none;border-top:1px solid var(--border)">
     <h2 style="margin-top:0;font-size:1.1rem">Правни страници (HTML не е позволен — само текст)</h2>
-    <div class="form-group"><label>Поверителност</label><textarea name="legal_privacy" rows="6"><?= htmlspecialchars($legal['privacy'] ?? '') ?></textarea></div>
-    <div class="form-group"><label>Общи условия</label><textarea name="legal_terms" rows="6"><?= htmlspecialchars($legal['terms'] ?? '') ?></textarea></div>
+    <div class="form-group"><label>Поверителност</label><textarea name="legal_privacy" rows="8"><?= htmlspecialchars($legal['privacy'] ?? '') ?></textarea></div>
+    <div class="form-group"><label>GDPR</label><textarea name="legal_gdpr" rows="8"><?= htmlspecialchars($legal['gdpr'] ?? '') ?></textarea></div>
+    <div class="form-group"><label>Общи условия</label><textarea name="legal_terms" rows="8"><?= htmlspecialchars($legal['terms'] ?? '') ?></textarea></div>
     <div class="form-group"><label>Бисквитки</label><textarea name="legal_cookies" rows="4"><?= htmlspecialchars($legal['cookies'] ?? '') ?></textarea></div>
     <button type="submit" class="btn btn-primary">Запази футъра</button>
 </form>

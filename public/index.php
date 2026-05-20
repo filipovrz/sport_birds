@@ -48,10 +48,24 @@ $router->get('/login', 'AuthController@showLogin', array_merge($mw, $installed, 
 $router->post('/login', 'AuthController@login', array_merge($mw, $installed, [GuestMiddleware::class], $csrf));
 $router->get('/register', 'AuthController@showRegister', array_merge($mw, $installed, [GuestMiddleware::class]));
 $router->post('/register', 'AuthController@register', array_merge($mw, $installed, [GuestMiddleware::class], $csrf));
-$router->get('/verify-email/pending', 'AuthController@showVerifyPending', array_merge($mw, $installed, [GuestMiddleware::class]));
+$router->get('/verify-email/pending', 'AuthController@showVerifyPending', array_merge($mw, $installed));
 $router->get('/verify-email', 'AuthController@verifyEmail', array_merge($mw, $installed));
 $router->post('/verify-email/resend', 'AuthController@resendVerification', array_merge($mw, $installed, $csrf));
 $router->post('/logout', 'AuthController@logout', array_merge($mw, $installed, $csrf));
+
+// Плащания (webhooks без CSRF)
+$router->post('/webhooks/stripe', 'WebhookController@stripe', $mw);
+$router->post('/webhooks/epay', 'WebhookController@epay', $mw);
+$router->post('/webhooks/paypal', 'WebhookController@paypal', $mw);
+$router->post('/webhooks/revolut', 'WebhookController@revolut', $mw);
+
+$router->group(['middleware' => array_merge($mw, $installed, [AuthMiddleware::class])], function (Router $r) {
+    $r->get('/payment/bank/{token}', 'PaymentController@bank');
+    $r->get('/payment/status/{token}', 'PaymentController@status');
+    $r->get('/payment/return/{token}', 'PaymentController@return');
+    $r->get('/payment/cancel/{token}', 'PaymentController@cancel');
+    $r->get('/payment/go/{token}', 'PaymentController@redirectForm');
+});
 
 // Общност (логнати потребители)
 $router->group(['middleware' => array_merge($mw, $installed, [AuthMiddleware::class])], function (Router $r) {
@@ -111,6 +125,9 @@ $router->group(['prefix' => '/dashboard', 'middleware' => array_merge($mw, $inst
     $r->post('/subscription/request', 'SubscriptionController@requestPlan', $csrf);
 
     $r->get('/map', 'MapController@index');
+    $r->get('/export/birds.csv', 'ExportController@birds');
+    $r->get('/export/lofts.csv', 'ExportController@lofts');
+    $r->get('/export/competitions.csv', 'ExportController@competitions');
     $r->get('/gps', 'GpsDeviceController@index');
     $r->get('/gps/create', 'GpsDeviceController@create');
     $r->post('/gps', 'GpsDeviceController@store', $csrf);

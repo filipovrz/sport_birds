@@ -29,7 +29,7 @@ function initBsMap(containerId, markers, options) {
         loft: '#1e5f8a',
         gps: '#c9a227',
         competition: '#2d8a5e',
-        event: '#2d8a5e',
+        event: '#7c3aed',
     };
 
     function bsMapIcon(type) {

@@ -1,5 +1,6 @@
-<?php
+﻿<?php
 use App\Services\FooterService;
+use App\Services\PaymentMethodsService;
 use App\Services\SettingsService;
 
 $footer = FooterService::config();
@@ -11,42 +12,92 @@ $contactEmail = SettingsService::get('contact_email') ?: ($footer['email'] ?? ''
 $year = date('Y');
 $copyright = trim($footer['copyright'] ?? '');
 if ($copyright === '') {
-    $copyright = '© ' . $year . ' ' . $siteName;
+    $copyright = 'Evtinko © ' . $year . ' ' . $siteName;
 }
+$company = $footer['company'] ?? [];
+$companyLines = FooterService::companyLines($company);
+$hasCompany = $companyLines !== [];
+$linkColumns = [];
+foreach ($footer['columns'] ?? [] as $col) {
+    if (!empty($col['links'])) {
+        $linkColumns[] = $col;
+    }
+}
+$paymentMethods = PaymentMethodsService::forFooter();
+$paymentNote = PaymentMethodsService::footerNoteStored();
+$hasPayment = $paymentMethods !== [];
+$navCount = ($hasCompany ? 1 : 0) + count($linkColumns) + ($hasPayment ? 1 : 0);
 ?>
 <footer class="site-footer">
     <div class="container site-footer__grid">
         <div class="site-footer__brand">
-            <strong><?= htmlspecialchars($siteName) ?></strong>
+            <strong class="site-footer__title"><?= htmlspecialchars($siteName) ?></strong>
             <?php if (!empty($footer['tagline'])): ?>
-            <p><?= htmlspecialchars($footer['tagline']) ?></p>
+            <p class="site-footer__tagline"><?= htmlspecialchars($footer['tagline']) ?></p>
             <?php endif; ?>
-            <?php if (!empty($footer['address'])): ?>
-            <p class="site-footer__meta"><?= nl2br(htmlspecialchars($footer['address'])) ?></p>
-            <?php endif; ?>
-            <?php if (!empty($footer['phone'])): ?>
-            <p class="site-footer__meta">Тел.: <?= htmlspecialchars($footer['phone']) ?></p>
-            <?php endif; ?>
-            <?php if ($contactEmail !== ''): ?>
-            <p class="site-footer__meta"><a href="mailto:<?= htmlspecialchars($contactEmail) ?>"><?= htmlspecialchars($contactEmail) ?></a></p>
-            <?php endif; ?>
-        </div>
-        <?php foreach ($footer['columns'] ?? [] as $col): ?>
-        <?php if (!empty($col['links'])): ?>
-        <div class="site-footer__col">
-            <h3><?= htmlspecialchars($col['title'] ?? '') ?></h3>
-            <ul>
-                <?php foreach ($col['links'] as $link): ?>
-                <li><a href="<?= htmlspecialchars($link['url']) ?>"><?= htmlspecialchars($link['label']) ?></a></li>
-                <?php endforeach; ?>
+            <?php if (!empty($footer['address']) || !empty($footer['phone']) || $contactEmail !== ''): ?>
+            <ul class="site-footer__contacts">
+                <?php if (!empty($footer['address'])): ?>
+                <li><?= nl2br(htmlspecialchars($footer['address'])) ?></li>
+                <?php endif; ?>
+                <?php if (!empty($footer['phone'])): ?>
+                <li>Тел.: <?= htmlspecialchars($footer['phone']) ?></li>
+                <?php endif; ?>
+                <?php if ($contactEmail !== ''): ?>
+                <li><a href="mailto:<?= htmlspecialchars($contactEmail) ?>"><?= htmlspecialchars($contactEmail) ?></a></li>
+                <?php endif; ?>
             </ul>
+            <?php endif; ?>
         </div>
-        <?php endif; ?>
-        <?php endforeach; ?>
-        <?php if (!empty($footer['payment_text'])): ?>
-        <div class="site-footer__col">
-            <h3><?= htmlspecialchars($footer['payment_title'] ?? 'Начини на плащане') ?></h3>
-            <div class="site-footer__payment"><?= nl2br(htmlspecialchars($footer['payment_text'])) ?></div>
+        <?php if ($navCount > 0): ?>
+        <div class="site-footer__nav" style="--footer-nav-cols: <?= max(2, min(4, $navCount)) ?>">
+            <?php if ($hasCompany): ?>
+            <div class="site-footer__col site-footer__col--company">
+                <h3><?= htmlspecialchars($company['title'] ?? 'Информация') ?></h3>
+                <ul class="site-footer__company-list">
+                    <?php foreach ($companyLines as $line): ?>
+                    <li>
+                        <span class="site-footer__company-label"><?= htmlspecialchars($line['label']) ?>:</span>
+                        <?php if ($line['href']): ?>
+                        <a href="<?= htmlspecialchars($line['href']) ?>"><?= htmlspecialchars($line['value']) ?></a>
+                        <?php else: ?>
+                        <?= nl2br(htmlspecialchars($line['value'])) ?>
+                        <?php endif; ?>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <?php endif; ?>
+            <?php foreach ($linkColumns as $col): ?>
+            <div class="site-footer__col">
+                <h3><?= htmlspecialchars($col['title'] ?? '') ?></h3>
+                <ul>
+                    <?php foreach ($col['links'] as $link): ?>
+                    <li><a href="<?= htmlspecialchars($link['url']) ?>"><?= htmlspecialchars($link['label']) ?></a></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <?php endforeach; ?>
+            <?php if ($hasPayment): ?>
+            <div class="site-footer__col site-footer__col--payment">
+                <h3><?= htmlspecialchars($footer['payment_title'] ?? 'Начини на плащане') ?></h3>
+                <ul class="site-footer__payment-list">
+                    <?php foreach ($paymentMethods as $method): ?>
+                    <li>
+                        <span class="site-footer__payment-name"><?= htmlspecialchars($method['name']) ?></span>
+                        <?php if (!empty($method['automatic'])): ?>
+                        <span class="site-footer__payment-badge site-footer__payment-badge--auto">автоматично</span>
+                        <?php else: ?>
+                        <span class="site-footer__payment-badge site-footer__payment-badge--manual">ръчно одобрение</span>
+                        <?php endif; ?>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+                <?php if ($paymentNote !== ''): ?>
+                <p class="site-footer__payment-note"><?= htmlspecialchars($paymentNote) ?></p>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
         </div>
         <?php endif; ?>
     </div>

@@ -9,6 +9,7 @@ use App\Core\Controller;
 use App\Core\Database;
 use App\Core\Session;
 use App\Models\User;
+use App\Services\PaymentService;
 use App\Services\SettingsService;
 use App\Services\SubscriptionService;
 
@@ -81,6 +82,15 @@ final class SubscriptionController extends Controller
             'processed_by' => Auth::id(),
             'processed_at' => date('Y-m-d H:i:s'),
         ], 'id = ?', [(int) $id]);
+        if (!empty($req['payment_id'])) {
+            $pay = PaymentService::findById((int) $req['payment_id']);
+            if ($pay && ($pay['status'] ?? '') !== 'paid') {
+                Database::update('payments', [
+                    'status' => 'paid',
+                    'paid_at' => date('Y-m-d H:i:s'),
+                ], 'id = ?', [(int) $req['payment_id']]);
+            }
+        }
         Session::flash('success', 'Абонаментът е активиран.');
         $this->redirect('/admin/subscriptions');
     }

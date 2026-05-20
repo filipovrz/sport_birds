@@ -25,8 +25,8 @@
 <form method="post" action="/dashboard/subscription/request">
     <?= csrf_field() ?>
     <input type="hidden" name="plan_id" value="<?= (int)$plan['id'] ?>">
-    <input name="payment_reference" placeholder="Референция на плащане" required>
-    <button class="btn btn-primary" style="margin-top:0.5rem">Заяви</button>
+    <?php require BASE_PATH . '/resources/views/payment/_methods.php'; ?>
+    <button class="btn btn-primary" style="margin-top:0.75rem">Продължи към плащане</button>
 </form>
 <?php endif; ?>
 </div>
