@@ -7,6 +7,7 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Core\Database;
 use App\Core\Session;
+use App\Services\InvoiceService;
 use App\Services\PaymentService;
 use App\Services\SettingsService;
 
@@ -25,9 +26,11 @@ final class PaymentController extends Controller
             $this->redirect('/payment/status/' . $token);
         }
         Database::update('payments', ['status' => 'pending'], 'id = ?', [(int) $payment['id']]);
+        $proforma = InvoiceService::issueProformaForPayment((int) $payment['id']);
         $this->view('payment.bank', [
             'payment' => $payment,
             'reference' => PaymentService::bankReference($payment),
+            'proforma' => $proforma,
             'instructions' => SettingsService::paymentInstructions(),
             'amountEur' => (float) $payment['amount_eur'],
             'amountBgn' => (float) ($payment['amount_bgn'] ?? 0),
@@ -43,9 +46,20 @@ final class PaymentController extends Controller
             exit;
         }
         PaymentService::assertOwner($payment);
+        $paid = ($payment['status'] ?? '') === 'paid';
+        $proforma = null;
+        $invoice = null;
+        if (($payment['method'] ?? '') === 'bank') {
+            $proforma = InvoiceService::issueProformaForPayment((int) $payment['id']);
+        }
+        if ($paid) {
+            $invoice = InvoiceService::issueForPayment((int) $payment['id']);
+        }
         $this->view('payment.status', [
             'payment' => $payment,
-            'paid' => ($payment['status'] ?? '') === 'paid',
+            'paid' => $paid,
+            'proforma' => $proforma,
+            'invoice' => $invoice,
             'successUrl' => $this->successRedirectUrl($payment),
         ], 'layouts.app');
     }

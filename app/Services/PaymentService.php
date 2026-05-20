@@ -68,6 +68,10 @@ final class PaymentService
         }
         self::linkPayable($payableType, $payableId, $id, $methodSlug);
 
+        if ($methodSlug === 'bank') {
+            InvoiceService::issueProformaForPayment($id);
+        }
+
         return $payment;
     }
 
@@ -105,6 +109,27 @@ final class PaymentService
     public static function bankReference(array $payment): string
     {
         return 'BSB-' . str_pad((string) $payment['id'], 8, '0', STR_PAD_LEFT);
+    }
+
+    /** Маркира плащането като платено и издава фактура (идемпотентно). */
+    public static function markPaid(int $paymentId, ?string $gatewayPaymentId = null): bool
+    {
+        $payment = self::findById($paymentId);
+        if (!$payment) {
+            return false;
+        }
+        if (($payment['status'] ?? '') !== 'paid') {
+            Database::update('payments', [
+                'status' => 'paid',
+                'gateway_payment_id' => $gatewayPaymentId ?? $payment['gateway_payment_id'] ?? null,
+                'paid_at' => date('Y-m-d H:i:s'),
+            ], 'id = ? AND status != ?', [$paymentId, 'paid']);
+        }
+        InvoiceService::issueForPayment($paymentId);
+
+        $fresh = self::findById($paymentId);
+
+        return $fresh !== null && ($fresh['status'] ?? '') === 'paid';
     }
 
     /** @return array<string, mixed>|null */

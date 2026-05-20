@@ -11,4 +11,5 @@ if ($variant !== 'sidebar') {
     <a href="/dashboard/subscription">Абонамент</a>
     <a href="/dashboard/gps">GPS устройства</a>
     <a href="/dashboard/profile">Редактирай</a>
+    <a href="/dashboard/invoices">Фактури</a>
 </details>

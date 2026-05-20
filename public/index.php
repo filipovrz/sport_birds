@@ -87,6 +87,10 @@ $router->group(['prefix' => '/dashboard', 'middleware' => array_merge($mw, $inst
     $r->get('/profile', 'ProfileController@edit');
     $r->post('/profile', 'ProfileController@update', $csrf);
 
+    $r->get('/invoices', 'InvoiceController@index');
+    $r->get('/invoices/{id}', 'InvoiceController@show');
+    $r->get('/invoices/{id}/print', 'InvoiceController@print');
+
     $r->get('/lofts', 'LoftController@index');
     $r->get('/lofts/create', 'LoftController@create');
     $r->post('/lofts', 'LoftController@store', $csrf);

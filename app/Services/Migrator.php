@@ -23,6 +23,8 @@ final class Migrator
         '2.2.0' => 'phase3_8.sql',
         '3.0.0' => 'phase4_payments.sql',
         '3.0.1' => 'phase4_1_footer_cleanup.sql',
+        '3.1.0' => 'phase4_2_invoices.sql',
+        '3.2.0' => 'phase4_3_proforma.sql',
     ];
 
     public static function currentVersion(): string

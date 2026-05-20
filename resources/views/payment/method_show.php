@@ -29,7 +29,7 @@ use App\Services\PaymentMethodsService;
         <form method="post" action="<?= htmlspecialchars($checkoutUrl) ?>">
             <?= csrf_field() ?>
             <?php if ($method['slug'] === 'bank' && $bankInstructions !== ''): ?>
-            <div class="payment-detail__bank" style="margin-bottom:1rem"><?= nl2br(htmlspecialchars($bankInstructions)) ?></motion>
+            <div class="payment-detail__bank" style="margin-bottom:1rem"><?= nl2br(htmlspecialchars($bankInstructions)) ?></div>
             <?php endif; ?>
             <div class="form-group">
                 <label>Абонаментен план (по избор)</label>

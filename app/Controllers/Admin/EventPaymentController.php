@@ -8,6 +8,7 @@ use App\Core\Auth;
 use App\Core\Controller;
 use App\Core\Database;
 use App\Core\Session;
+use App\Services\PaymentService;
 use App\Services\SettingsService;
 
 final class EventPaymentController extends Controller
@@ -64,7 +65,8 @@ final class EventPaymentController extends Controller
 
     public function approve(string $id): void
     {
-        if (!$this->findPending((int) $id)) {
+        $ev = $this->findPending((int) $id);
+        if (!$ev) {
             $this->redirect('/admin/event-payments');
         }
         Database::update('event_announcements', [
@@ -74,6 +76,9 @@ final class EventPaymentController extends Controller
             'payment_processed_at' => date('Y-m-d H:i:s'),
             'is_featured' => isset($_POST['is_featured']) ? 1 : 0,
         ], 'id = ?', [(int) $id]);
+        if (!empty($ev['payment_id'])) {
+            PaymentService::markPaid((int) $ev['payment_id']);
+        }
         Session::flash('success', 'Плащането е потвърдено. Обявата е публикувана.');
         $this->redirect('/admin/event-payments/' . $id);
     }

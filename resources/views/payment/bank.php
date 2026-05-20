@@ -5,6 +5,12 @@
     </p>
     <p><strong>Основание / референция:</strong> <code style="font-size:1.1rem"><?= htmlspecialchars($reference) ?></code></p>
     <p style="color:var(--muted)">Задължително посочете референцията при превода. След постъпване на сумата администраторът ще активира заявката (обикновено в рамките на 1 работен ден).</p>
+    <?php if (!empty($proforma['id'])): ?>
+    <p style="margin-top:1rem">
+        <a href="/dashboard/invoices/<?= (int) $proforma['id'] ?>/print" class="btn btn-primary" target="_blank" rel="noopener">Проформа фактура (PDF)</a>
+        <span class="text-muted" style="margin-left:0.5rem">№ поръчка <?= htmlspecialchars($reference) ?> · <?= htmlspecialchars($payment['description'] ?? '') ?></span>
+    </p>
+    <?php endif; ?>
     <?php if (!empty($instructions)): ?>
     <hr style="border:none;border-top:1px solid var(--border);margin:1rem 0">
     <h3 style="margin-top:0">Банкови данни</h3>

@@ -18,16 +18,15 @@ final class PaymentFulfillmentService
     public static function markPaidAndFulfill(array $payment, ?string $gatewayPaymentId = null): bool
     {
         if (($payment['status'] ?? '') === 'paid') {
-            return true;
-        }
-        Database::update('payments', [
-            'status' => 'paid',
-            'gateway_payment_id' => $gatewayPaymentId ?? $payment['gateway_payment_id'] ?? null,
-            'paid_at' => date('Y-m-d H:i:s'),
-        ], 'id = ? AND status != ?', [(int) $payment['id'], 'paid']);
+            InvoiceService::issueForPayment((int) $payment['id']);
 
+            return self::fulfillPayable($payment);
+        }
+        if (!PaymentService::markPaid((int) $payment['id'], $gatewayPaymentId)) {
+            return false;
+        }
         $fresh = PaymentService::findById((int) $payment['id']);
-        if (!$fresh || ($fresh['status'] ?? '') !== 'paid') {
+        if (!$fresh) {
             return false;
         }
 

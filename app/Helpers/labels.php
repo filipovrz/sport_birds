@@ -241,6 +241,15 @@ function format_plan_price_suffix(array $plan): string
     return '';
 }
 
+function invoice_document_type_label(string $type): string
+{
+    return match ($type) {
+        'proforma' => 'Проформа',
+        'invoice' => 'Фактура',
+        default => $type,
+    };
+}
+
 function payment_icon_text(string $icon): string
 {
     return match ($icon) {

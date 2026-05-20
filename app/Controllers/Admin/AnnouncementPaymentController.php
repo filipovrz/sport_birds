@@ -8,6 +8,7 @@ use App\Core\Auth;
 use App\Core\Controller;
 use App\Core\Database;
 use App\Core\Session;
+use App\Services\PaymentService;
 use App\Services\SettingsService;
 
 final class AnnouncementPaymentController extends Controller
@@ -75,6 +76,9 @@ final class AnnouncementPaymentController extends Controller
             'payment_processed_at' => date('Y-m-d H:i:s'),
             'is_featured' => isset($_POST['is_featured']) ? 1 : 0,
         ], 'id = ?', [(int) $id]);
+        if (!empty($ann['payment_id'])) {
+            PaymentService::markPaid((int) $ann['payment_id']);
+        }
         Session::flash('success', 'Плащането е потвърдено. Обявата е публикувана.');
         $this->redirect('/admin/announcement-payments/' . $id);
     }
