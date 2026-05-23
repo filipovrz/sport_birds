@@ -15,6 +15,7 @@ spl_autoload_register(function (string $class): void {
 });
 
 require_once BASE_PATH . '/app/Helpers/labels.php';
+require_once BASE_PATH . '/app/Helpers/i18n.php';
 
 $config = require BASE_PATH . '/config/app.php';
 date_default_timezone_set($config['timezone']);
@@ -29,6 +30,7 @@ if (is_file(BASE_PATH . '/.env')) {
     }
     try {
         \App\Services\Migrator::runPending();
+        \App\Services\InvoiceService::backfillMissingBankProformas();
     } catch (\Throwable) {
         // DB not ready during install
     }

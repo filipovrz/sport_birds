@@ -58,6 +58,20 @@ a:hover { text-decoration: underline; }
   flex-wrap: wrap;
   justify-content: flex-end;
 }
+.lang-switcher__link {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  color: inherit;
+}
+.lang-switcher__link:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
 .site-header__user {
   opacity: 0.9;
   font-size: 0.92rem;

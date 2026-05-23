@@ -80,6 +80,9 @@ final class AdminPermissionService
         if (str_starts_with($path, '/admin/subscriptions')) {
             return 'subscriptions';
         }
+        if (str_starts_with($path, '/admin/invoices')) {
+            return 'subscriptions';
+        }
         if (str_starts_with($path, '/admin/announcement-payments')
             || str_starts_with($path, '/admin/competition-archive')) {
             return 'announcements';

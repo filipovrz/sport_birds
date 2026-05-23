@@ -1,49 +1,24 @@
 # Best Sport Byrds — Checkpoint
 
-**Версия:** 3.2.0 · **Фаза:** 3.2 (фактури + плащания) · **Следваща:** 3.3 (EN, analytics)  
-**Статус:** Плащания + фактури (проформа при банка, оригинал след плащане)
+**Версия:** 3.3.0 · **Фаза:** 3.3 · **Следваща:** 4.0 (production keys, full EN)  
+**Статус:** Feature-complete без API ключове от payment providers
 
 ---
 
-## Фаза 1 — ядро (1.0.0) ✅
+## Фаза 3.3 — EN + analytics + админ фактури ✅
 
-- [x] Птици, гълъбарници, родословна, развъждане, здраве, тренировки
-- [x] Лични състезания + резултати
-- [x] Абонаменти (ръчно одобрение), админ, супер админ
-- [x] CSRF, инсталатор, Docker, снимки, печат родословна
+- [x] **EN език** — `LocaleService`, `resources/lang/{bg,en}.php`, преключвател BG/EN в header
+- [x] **Разширен analytics dashboard** — потребителско табло + админ обзор (приходи, плащания, фактури)
+- [x] **Админ → Фактури** — списък, преглед, печат
+- [x] Backfill проформи за стари банкови плащания
+- [x] Map fix (`event_announcements`)
+- [x] `docs/PAYMENT_PROVIDERS_CHECKLIST.md`
 
----
+## Остава (извън код / по choice)
 
-## Фаза 2 — GPS, карта, обяви (2.0.0) ✅
-
-- [x] GPS устройства, API, карта, обяви състезания и събития
-- [x] Публични обяви, общност, CSV, cron здраве
-
----
-
-## Фаза 3.0 — плащания ✅
-
-- [x] `payments`, Stripe, ePay, PayPal, Revolut, банков превод
-- [x] Webhooks, fulfillment, `/payment-methods`
-- [x] Footer cleanup (3.0.1)
-
----
-
-## Фаза 3.1–3.2 — фактури ✅
-
-- [x] Таблица `invoices`, billing полета в профила
-- [x] **Профил → Фактури** — списък, преглед, печат/PDF
-- [x] Автоматична фактура след `markPaid` (онлайн и админ)
-- [x] **Проформа** при банков превод (№ поръчка, описание, получател)
-- [x] **Оригинална фактура** след потвърдено плащане, връзка с проформа
-- [x] Миграции `phase4_2_invoices.sql`, `phase4_3_proforma.sql`
-
----
-
-## Фаза 3.3 — планирано
-
-- [ ] EN език
-- [ ] Разширен analytics dashboard
+- [ ] API ключове Stripe, ePay, PayPal, Revolut
+- [ ] Production HTTPS + webhook URL-и
+- [ ] Пълен превод на всички ~105 views (EN v1 = shell + dashboard)
 
 ---
 
@@ -55,8 +30,8 @@ docker compose up -d
 
 | URL | Описание |
 |-----|----------|
-| http://localhost:8080/ | Начало |
-| http://localhost:8080/dashboard/invoices | Фактури (вход) |
-| http://localhost:8080/payment-methods | Начини на плащане |
+| http://localhost:8080/dashboard | Статистика + analytics |
+| http://localhost:8080/locale/en?return=/dashboard | English UI (shell) |
+| http://localhost:8080/admin/invoices | Фактури (админ) |
 
-Вижте `VERSION.md`, `CHAT_SAFE.md`, `docs/PAYMENTS.md`.
+Вижте `VERSION.md`, `CHAT_SAFE.md`.

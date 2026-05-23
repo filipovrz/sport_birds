@@ -77,7 +77,7 @@ final class MapController extends Controller
 
         $events = Database::fetchAll(
             "SELECT id, title, latitude, longitude, event_date, location
-             FROM events
+             FROM event_announcements
              WHERE status = 'published'
              AND event_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
              ORDER BY event_date ASC

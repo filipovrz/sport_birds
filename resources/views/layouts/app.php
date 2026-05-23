@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="bg">
+<html lang="<?= htmlspecialchars(locale()) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($config['name']) ?> — Табло</title>
+    <title><?= htmlspecialchars($config['name']) ?> — <?= htmlspecialchars(__('common.dashboard_title')) ?></title>
     <link rel="stylesheet" href="/assets/css/app.css">
 </head>
 <body class="app-shell">
@@ -11,12 +11,13 @@
     <div class="container site-header__inner">
         <a href="/dashboard" class="brand"><?= htmlspecialchars($config['name']) ?> <small style="font-size:0.65em;opacity:0.85">v<?= htmlspecialchars($config['version'] ?? '1') ?></small></a>
         <nav class="site-header__nav">
+            <?php require __DIR__ . '/_lang_switcher.php'; ?>
             <span class="site-header__user"><?= htmlspecialchars($user['name'] ?? '') ?></span>
-            <?php if (\App\Core\Auth::isAdmin()): ?><a href="/admin">Админ</a><?php endif; ?>
-            <?php if (\App\Core\Auth::isSuperAdmin()): ?><a href="/super-admin">Супер админ</a><?php endif; ?>
+            <?php if (\App\Core\Auth::isAdmin()): ?><a href="/admin"><?= htmlspecialchars(__('nav.admin')) ?></a><?php endif; ?>
+            <?php if (\App\Core\Auth::isSuperAdmin()): ?><a href="/super-admin"><?= htmlspecialchars(__('nav.super_admin')) ?></a><?php endif; ?>
             <form action="/logout" method="post" class="site-header__logout">
                 <?= csrf_field() ?>
-                <button type="submit" class="btn btn-sm btn-outline site-header__logout-btn">Изход</button>
+                <button type="submit" class="btn btn-sm btn-outline site-header__logout-btn"><?= htmlspecialchars(__('nav.logout')) ?></button>
             </form>
         </nav>
     </div>
@@ -26,15 +27,15 @@
     <?php if ($msg = \App\Core\Session::flash('error')): ?><div class="alert alert-error"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
     <div class="sidebar-layout">
         <div class="sidebar-mobile-bar">
-            <button type="button" class="btn btn-outline sidebar-toggle" data-sidebar-toggle aria-expanded="false" aria-controls="app-sidebar">☰ Меню</button>
+            <button type="button" class="btn btn-outline sidebar-toggle" data-sidebar-toggle aria-expanded="false" aria-controls="app-sidebar">☰ <?= htmlspecialchars(__('nav.menu')) ?></button>
         </div>
         <aside class="sidebar" id="app-sidebar">
-            <a href="/">← Начало</a>
+            <a href="/"><?= htmlspecialchars(__('nav.home')) ?></a>
             <?php $variant = 'sidebar'; require __DIR__ . '/_nav_dashboard.php'; ?>
             <?php require __DIR__ . '/_nav_announcements.php'; ?>
             <?php require __DIR__ . '/_nav_profile.php'; ?>
-            <a href="/community">Общност</a>
-            <a href="/dashboard/map">Карта</a>
+            <a href="/community"><?= htmlspecialchars(__('nav.community')) ?></a>
+            <a href="/dashboard/map"><?= htmlspecialchars(__('nav.map')) ?></a>
         </aside>
         <section class="dashboard-content">
             <?= $content ?>

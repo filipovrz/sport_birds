@@ -2,7 +2,7 @@
 
 return [
     'name' => 'Best Sport Byrds',
-    'version' => '3.2.0',
+    'version' => '3.3.0',
     'phase' => 3,
     'tagline' => 'Професионално управление на спортни птици',
     'url' => $_ENV['APP_URL'] ?? 'http://localhost:8080',

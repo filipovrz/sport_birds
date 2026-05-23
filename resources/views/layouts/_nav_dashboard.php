@@ -6,10 +6,10 @@ if ($variant !== 'sidebar') {
 }
 ?>
 <details class="nav-group">
-    <summary>Табло</summary>
-    <a href="/dashboard/lofts">Гълъбарници</a>
-    <a href="/dashboard/birds">Птици</a>
-    <a href="/dashboard/breeding">Развъждане</a>
-    <a href="/dashboard/health">Здраве</a>
-    <a href="/dashboard/training">Тренировки</a>
+    <summary><?= htmlspecialchars(__('nav.dashboard')) ?></summary>
+    <a href="/dashboard/lofts"><?= htmlspecialchars(__('nav.lofts')) ?></a>
+    <a href="/dashboard/birds"><?= htmlspecialchars(__('nav.birds')) ?></a>
+    <a href="/dashboard/breeding"><?= htmlspecialchars(__('nav.breeding')) ?></a>
+    <a href="/dashboard/health"><?= htmlspecialchars(__('nav.health')) ?></a>
+    <a href="/dashboard/training"><?= htmlspecialchars(__('nav.training')) ?></a>
 </details>

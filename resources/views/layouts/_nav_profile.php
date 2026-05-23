@@ -6,10 +6,10 @@ if ($variant !== 'sidebar') {
 }
 ?>
 <details class="nav-group">
-    <summary>Профил</summary>
-    <a href="/dashboard">Статистика</a>
-    <a href="/dashboard/subscription">Абонамент</a>
-    <a href="/dashboard/gps">GPS устройства</a>
-    <a href="/dashboard/profile">Редактирай</a>
-    <a href="/dashboard/invoices">Фактури</a>
+    <summary><?= htmlspecialchars(__('nav.profile')) ?></summary>
+    <a href="/dashboard"><?= htmlspecialchars(__('nav.stats')) ?></a>
+    <a href="/dashboard/subscription"><?= htmlspecialchars(__('nav.subscription')) ?></a>
+    <a href="/dashboard/gps"><?= htmlspecialchars(__('nav.gps')) ?></a>
+    <a href="/dashboard/profile"><?= htmlspecialchars(__('nav.edit_profile')) ?></a>
+    <a href="/dashboard/invoices"><?= htmlspecialchars(__('nav.invoices')) ?></a>
 </details>

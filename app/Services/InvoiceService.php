@@ -228,4 +228,22 @@ final class InvoiceService
 
         return sprintf('%s-%s-%06d', $prefix, $year, $seq);
     }
+
+    /** Еднократно попълване на липсващи проформи за банкови плащания. */
+    public static function backfillMissingBankProformas(): void
+    {
+        if (SettingsService::get('invoice_proforma_backfill_done') === '1') {
+            return;
+        }
+        try {
+            $payments = Database::fetchAll(
+                "SELECT id FROM payments WHERE method = 'bank' AND status IN ('created', 'pending', 'paid')"
+            );
+            foreach ($payments as $payment) {
+                self::issueProformaForPayment((int) $payment['id']);
+            }
+            SettingsService::set('invoice_proforma_backfill_done', '1');
+        } catch (\Throwable) {
+        }
+    }
 }

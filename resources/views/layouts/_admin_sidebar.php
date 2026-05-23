@@ -15,6 +15,7 @@ use App\Services\AdminPermissionService;
 <?php endif; ?>
 <?php if (AdminPermissionService::can('subscriptions')): ?>
 <a href="/admin/subscriptions">Абонаменти</a>
+<a href="/admin/invoices">Фактури</a>
 <?php endif; ?>
 <?php if (AdminPermissionService::can('announcements') || AdminPermissionService::can('events')): ?>
 <?php $variant = 'admin'; require __DIR__ . '/_nav_announcements.php'; ?>

@@ -17,6 +17,7 @@ use App\Middleware\RequireInstallMiddleware;
 use App\Middleware\InstallLockMiddleware;
 
 Session::start();
+\App\Services\LocaleService::init();
 
 $router = new Router();
 $mw = [MaintenanceMiddleware::class];
@@ -34,6 +35,7 @@ $router->get('/pricing', 'HomeController@pricing', array_merge($mw, $installed))
 $router->get('/payment-methods', 'PaymentMethodsController@index', array_merge($mw, $installed));
 $router->get('/payment-methods/{slug}', 'PaymentMethodsController@show', array_merge($mw, $installed));
 $router->get('/legal/{slug}', 'LegalController@show', array_merge($mw, $installed));
+$router->get('/locale/{lang}', 'LocaleController@switch', array_merge($mw, $installed));
 $router->get('/pedigree/public/{id}', 'PublicPedigreeController@show', $mw);
 $router->get('/announcements', 'AnnouncementController@index', array_merge($mw, $installed));
 $router->get('/announcements/{id}', 'AnnouncementController@show', array_merge($mw, $installed));
@@ -175,6 +177,9 @@ $router->group(['prefix' => '/admin', 'middleware' => array_merge($mw, $installe
     $r->post('/subscriptions/{id}/approve', 'Admin\SubscriptionController@approve', $csrf);
     $r->post('/subscriptions/{id}/reject', 'Admin\SubscriptionController@reject', $csrf);
     $r->post('/subscriptions/{id}/delete', 'Admin\SubscriptionController@destroy', $csrf);
+    $r->get('/invoices', 'Admin\InvoiceController@index');
+    $r->get('/invoices/{id}/print', 'Admin\InvoiceController@print');
+    $r->get('/invoices/{id}', 'Admin\InvoiceController@show');
     $r->get('/settings', 'Admin\SettingsController@index');
     $r->post('/settings', 'Admin\SettingsController@update', $csrf);
     $r->get('/footer', 'Admin\FooterController@index');

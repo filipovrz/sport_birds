@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bg">
+<html lang="<?= htmlspecialchars(locale()) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,17 +15,18 @@
     <div class="container site-header__inner">
         <a href="/" class="brand"><?= htmlspecialchars($config['name']) ?></a>
         <nav class="site-header__nav">
+            <?php require __DIR__ . '/_lang_switcher.php'; ?>
             <?php $variant = 'header'; require __DIR__ . '/_nav_announcements.php'; ?>
-            <a href="/pricing">Цени</a>
+            <a href="/pricing"><?= htmlspecialchars(__('nav.pricing')) ?></a>
             <?php if ($user): ?>
-                <a href="/community">Общност</a>
-                <a href="/dashboard">Моят акаунт</a>
+                <a href="/community"><?= htmlspecialchars(__('nav.community')) ?></a>
+                <a href="/dashboard"><?= htmlspecialchars(__('nav.my_account')) ?></a>
                 <form action="/logout" method="post" style="display:inline">
-                    <?= csrf_field() ?><button type="submit" class="btn btn-sm btn-outline" style="color:#fff;border-color:#fff">Изход</button>
+                    <?= csrf_field() ?><button type="submit" class="btn btn-sm btn-outline" style="color:#fff;border-color:#fff"><?= htmlspecialchars(__('nav.logout')) ?></button>
                 </form>
             <?php else: ?>
-                <a href="/login">Вход</a>
-                <a href="/register" class="btn btn-sm btn-accent">Регистрация</a>
+                <a href="/login"><?= htmlspecialchars(__('nav.login')) ?></a>
+                <a href="/register" class="btn btn-sm btn-accent"><?= htmlspecialchars(__('nav.register')) ?></a>
             <?php endif; ?>
         </nav>
     </div>

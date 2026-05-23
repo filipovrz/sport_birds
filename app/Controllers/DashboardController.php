@@ -9,6 +9,8 @@ use App\Core\Controller;
 use App\Core\Database;
 use App\Models\Bird;
 use App\Models\Loft;
+use App\Services\AnalyticsService;
+use App\Services\ExportService;
 use App\Services\SubscriptionService;
 
 final class DashboardController extends Controller
@@ -44,6 +46,8 @@ final class DashboardController extends Controller
         $cfg = require BASE_PATH . '/config/app.php';
         $this->view('dashboard.index', [
             'stats' => $stats,
+            'analytics' => AnalyticsService::userStats($uid),
+            'canExport' => ExportService::canExport(),
             'plan' => SubscriptionService::currentPlan(Auth::user()),
             'isPremium' => Auth::hasPremium(),
             'appVersion' => $cfg['version'] ?? '2.0.0',
